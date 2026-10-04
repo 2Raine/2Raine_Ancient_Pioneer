@@ -5,10 +5,10 @@
 # 全部摆到台面上，让跳过任何一步都变成显式的选择，而不是遗忘。
 #
 # 用法：
-#   pwsh -File preflight.ps1 before    # 动手前：列出必读材料 + 打印其指纹
-#   pwsh -File preflight.ps1 after     # 交付前：跑全部校验，输出结论
-#   pwsh -File preflight.ps1 log       # 查看错误日志（最近的错误记录）
-#   pwsh -File preflight.ps1 mistake "一句话描述这次错误"   # 记一次错误
+#   powershell -File preflight.ps1 before    # 动手前：列出必读材料 + 打印其指纹
+#   powershell -File preflight.ps1 after     # 交付前：跑全部校验，输出结论
+#   powershell -File preflight.ps1 log       # 查看错误日志（最近的错误记录）
+#   powershell -File preflight.ps1 mistake "一句话描述这次错误"   # 记一次错误
 
 [CmdletBinding()]
 param(
@@ -28,6 +28,9 @@ $REPO = $WS
 $MOD  = Join-Path $REPO 'mod\Toncihana_Elemental'
 $GAME = Join-Path $env:USERPROFILE 'AppData\LocalLow\Freehold Games\CavesOfQud'
 $PY   = 'C:\Users\16064\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe'
+# 编译产物目录：不能挂在 $env:TEMP 上 —— Reasonix 每个会话会改写 TEMP，
+# 那里没有 qud_api，Out-File 会因目录缺失而失败。LOCALAPPDATA\Temp 两边一致。
+$QAPI = Join-Path (Join-Path $env:LOCALAPPDATA 'Temp') 'qud_api'
 $TOOLS = Join-Path $WS '_tools'
 $MISTAKES = Join-Path $WS '错误日志.md'
 
@@ -112,7 +115,7 @@ function Show-After {
     # 2) 编译
     Write-Host '【2】C# 独立编译' -ForegroundColor Yellow
     $out = & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $TOOLS 'check_csharp.ps1') 2>&1 | Out-String
-    $log = Join-Path $env:TEMP 'qud_api\csc_out.txt'
+    $log = Join-Path $QAPI 'csc_out.txt'
     $errs = @()
     if (Test-Path $log) {
         $errs = Get-Content $log -Encoding UTF8 | Where-Object { $_ -match ': error ' }

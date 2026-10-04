@@ -14,9 +14,9 @@
 # 不是源码。仓库里也不该有它们（见 .gitignore）。
 #
 # 用法：
-#   pwsh -File sync.ps1 diff
-#   pwsh -File sync.ps1 push
-#   pwsh -File sync.ps1 pull
+#   powershell -File sync.ps1 diff
+#   powershell -File sync.ps1 push
+#   powershell -File sync.ps1 pull
 
 [CmdletBinding()]
 param(

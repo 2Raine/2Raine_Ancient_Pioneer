@@ -7,9 +7,9 @@
 # 所以把"改了代码"和"同步到 GitHub"绑成一条命令。
 #
 # 用法：
-#   pwsh -File publish.ps1 "这次改了什么"        # 提交 + 推送
-#   pwsh -File publish.ps1 "..." -NoPush        # 只提交，不推送
-#   pwsh -File publish.ps1 -Status              # 只看状态
+#   powershell -File publish.ps1 "这次改了什么"        # 提交 + 推送
+#   powershell -File publish.ps1 "..." -NoPush        # 只提交，不推送
+#   powershell -File publish.ps1 -Status              # 只看状态
 #
 # 前置：远程库必须已存在。首次建库见 README。
 
@@ -72,7 +72,7 @@ try {
     if (-not [string]::IsNullOrWhiteSpace($changes)) {
         if ([string]::IsNullOrWhiteSpace($Message)) {
             Write-Host '✗ 有未提交的改动，但没给提交说明。' -ForegroundColor Red
-            Write-Host '  用法: pwsh -File publish.ps1 "这次改了什么"'
+            Write-Host '  用法: powershell -File publish.ps1 "这次改了什么"'
             Write-Host ''
             $changes -split "`n" | Where-Object { $_.Trim() } | ForEach-Object { Write-Host "  $_" }
             exit 1
@@ -103,7 +103,7 @@ try {
         Write-Host '    1) 在 https://github.com/new 建一个【空】库（不要勾 README / .gitignore / license）'
         Write-Host '    2) 回到这里执行：'
         Write-Host '       git remote add origin git@github.com:2Raine/2Raine_Ancient_Pioneer.git'
-        Write-Host '       pwsh -File publish.ps1 "首次推送"'
+        Write-Host '       powershell -File publish.ps1 "首次推送"'
         Write-Host ''
         exit 1
     }

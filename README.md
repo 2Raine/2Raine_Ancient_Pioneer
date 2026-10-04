@@ -65,13 +65,13 @@ qud_db/  qud_src/             重建产物，已 .gitignore（重建法见下文
 
 ```powershell
 # 先看差异，不动文件
-pwsh -File sync.ps1 diff
+powershell -File sync.ps1 diff
 
 # 以工作区为准，覆盖游戏目录（改完代码走这个，然后重启游戏）
-pwsh -File sync.ps1 push
+powershell -File sync.ps1 push
 
 # 以游戏目录为准，覆盖工作区（在游戏目录里临时试改过之后用）
-pwsh -File sync.ps1 pull
+powershell -File sync.ps1 pull
 ```
 
 脚本**绝不复制 `*.dll` / `*.pdb`** —— 那是游戏编译 `Scripts\*.cs` 之后写到
@@ -94,10 +94,10 @@ pwsh -File sync.ps1 pull
 
 ```powershell
 # 提交 + 推送（最常用）
-pwsh -File publish.ps1 "这次改了什么"
+powershell -File publish.ps1 "这次改了什么"
 
-pwsh -File publish.ps1 "..." -NoPush   # 只提交，不推送
-pwsh -File publish.ps1 -Status         # 只看状态
+powershell -File publish.ps1 "..." -NoPush   # 只提交，不推送
+powershell -File publish.ps1 -Status         # 只看状态
 ```
 
 **每次改完代码都应该跑一次。** 完整的交付循环是：
@@ -105,10 +105,10 @@ pwsh -File publish.ps1 -Status         # 只看状态
 ```powershell
 # 1) 改代码（在仓库里改，不要在游戏目录里改）
 # 2) 同步到游戏 + 校验
-pwsh -File sync.ps1 push
-pwsh -File "..\_tools\preflight.ps1" after      # 编译 + XML/引用校验 + 日志 + git 状态
+powershell -File sync.ps1 push
+powershell -File "..\_tools\preflight.ps1" after      # 编译 + XML/引用校验 + 日志 + git 状态
 # 3) 推送到 GitHub
-pwsh -File publish.ps1 "说明这次改了什么"
+powershell -File publish.ps1 "说明这次改了什么"
 ```
 
 ### 首次使用：远程库必须先存在

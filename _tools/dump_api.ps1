@@ -3,7 +3,8 @@
 $ErrorActionPreference = 'Continue'
 
 $Dll = 'D:\SteamLibrary\steamapps\common\Caves of Qud\CoQ_Data\Managed\Assembly-CSharp.dll'
-$OutDir = Join-Path $env:TEMP 'qud_api'
+# Keep this off $env:TEMP, which Reasonix redefines per session (see check_csharp.ps1).
+$OutDir = Join-Path (Join-Path $env:LOCALAPPDATA 'Temp') 'qud_api'
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 $Out = Join-Path $OutDir 'api_types.txt'
 

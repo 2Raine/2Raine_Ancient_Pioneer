@@ -5,7 +5,15 @@ $ErrorActionPreference = 'Continue'
 $fw = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319'
 $managed = 'D:\SteamLibrary\steamapps\common\Caves of Qud\CoQ_Data\Managed'
 $scripts = Join-Path $env:USERPROFILE 'AppData\LocalLow\Freehold Games\CavesOfQud\Mods\Toncihana_Elemental\Scripts'
-$out = Join-Path $env:TEMP 'qud_api\toncihana_check.dll'
+
+# Output must not be keyed on $env:TEMP: Reasonix redefines TEMP per session
+# (...\Temp\reasonix-session-tmp-<id>), where qud_api does not exist, so Out-File
+# fails on a missing directory. LOCALAPPDATA\Temp is the same path under both hosts,
+# and we create it rather than assume it is already there.
+$qapi = Join-Path (Join-Path $env:LOCALAPPDATA 'Temp') 'qud_api'
+if (-not (Test-Path $qapi)) { New-Item -ItemType Directory -Force -Path $qapi | Out-Null }
+
+$out = Join-Path $qapi 'toncihana_check.dll'
 
 # System.dll / System.Core.dll are already pulled in implicitly by csc from the framework
 # directory; referencing the game's copies as well trips CS1703 (duplicate identity).
@@ -26,6 +34,6 @@ $cscArgs += $files
 
 Write-Host "compiling $($files.Count) files with $($refs.Count) references"
 $cscArgs += '/utf8output'
-$log = Join-Path $env:TEMP 'qud_api\csc_out.txt'
+$log = Join-Path $qapi 'csc_out.txt'
 & "$fw\csc.exe" $cscArgs 2>&1 | Out-File -FilePath $log -Encoding utf8
 Write-Host "exit=$LASTEXITCODE  log=$log"

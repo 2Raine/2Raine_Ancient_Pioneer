@@ -27,14 +27,14 @@
 
 ```powershell
 # 开工前
-pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" before
+powershell -File "D:\caves of qud 模组制作\_tools\preflight.ps1" before
 
 # 交付前（全跑一遍校验，不通过就 exit 1 —— 那时不许声称完成）
-pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" after
+powershell -File "D:\caves of qud 模组制作\_tools\preflight.ps1" after
 
 # 犯错后立刻记一条
-pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" mistake "一句话描述这次错误"
-pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" log
+powershell -File "D:\caves of qud 模组制作\_tools\preflight.ps1" mistake "一句话描述这次错误"
+powershell -File "D:\caves of qud 模组制作\_tools\preflight.ps1" log
 ```
 
 **犯错后的固定动作**：先 `mistake` 记进 `错误日志.md`，
@@ -104,8 +104,8 @@ Select-String -Path "$ws\qud_src\XRL\World\ZoneBuilders\*.cs" -Pattern "GetCell"
 
 # 3) 同步 + 全套校验（不启动游戏）
 cd $ws
-pwsh -File sync.ps1 push
-pwsh -File _tools\preflight.ps1 after     # 编译 + XML/引用校验 + 日志 + git 状态，给结论
+powershell -File sync.ps1 push
+powershell -File _tools\preflight.ps1 after     # 编译 + XML/引用校验 + 日志 + git 状态，给结论
 #    单独跑也可以：
 #    powershell -File "$ws\_tools\check_csharp.ps1"      # exit=0 才算过
 #    & $py "$ws\_tools\validate_mod.py"                  # 结构/命名/部件命名空间/解剖类别
@@ -116,7 +116,7 @@ Select-String -Path "$env:USERPROFILE\AppData\LocalLow\Freehold Games\CavesOfQud
               -Pattern '\[Toncihana\]|MODERROR.*Storm-Caller'
 
 # 5) 提交并推送到 GitHub（一条命令）
-pwsh -File publish.ps1 "说明这次改了什么"
+powershell -File publish.ps1 "说明这次改了什么"
 ```
 
 ### 交付前自检
@@ -258,6 +258,17 @@ XML 属性名 = 部件类上的 C# 公共字段/属性名（吻合率 **100%**�
 
 **注意 PATH**：`dotnet` / `ilspycmd` **不在** PATH 里，必须用绝对路径调用。
 
+**注意 shell**：本机**没有 `pwsh`**（PowerShell 7 未安装，`where pwsh` 为空，
+`Program Files\PowerShell` 不存在）。仓库内所有命令示例一律用
+`powershell -File ...`（Windows PowerShell 5.1）调用。
+DSH 那边的工具**恰好也叫 `pwsh`**，但那是宿主自带的工具名，不是 PATH 上的 pwsh.exe ——
+换宿主后不必也不该假设它还在。实测判据：`where.exe pwsh` 返回空。
+
+**注意编译产物目录**：固定为 `%LOCALAPPDATA%\Temp\qud_api`，**不要**改回 `$env:TEMP\qud_api`。
+有的宿主（如 Reasonix）会把 `TEMP` 每个会话改写成自己的临时目录，那里没有 `qud_api`，
+`Out-File` 会因目录缺失而失败，把"编译通过"误报成"编译未通过"。
+两个脚本都已按 `LOCALAPPDATA` 计算并自建目录，保留这个写法即可。
+
 ---
 
 ## 五、动模组前必须知道的坑
@@ -379,10 +390,10 @@ qud_db/  qud_src/            重建产物，已 .gitignore（重建法见 README
 
 ```powershell
 cd "D:\caves of qud 模组制作"
-pwsh -File sync.ps1 diff       # 只看差异，不动文件
-pwsh -File sync.ps1 push       # 工作区 -> 游戏（改完走这个，否则游戏跑旧代码）
-pwsh -File sync.ps1 pull       # 游戏 -> 工作区（在游戏目录临时试改过之后用）
-pwsh -File publish.ps1 "说明"   # 提交 + 推送到 GitHub
+powershell -File sync.ps1 diff       # 只看差异，不动文件
+powershell -File sync.ps1 push       # 工作区 -> 游戏（改完走这个，否则游戏跑旧代码）
+powershell -File sync.ps1 pull       # 游戏 -> 工作区（在游戏目录临时试改过之后用）
+powershell -File publish.ps1 "说明"   # 提交 + 推送到 GitHub
 ```
 
 脚本**绝不复制 `.dll` / `.pdb`** —— 那是游戏编译产物，在 `ModAssemblies\` 下。
