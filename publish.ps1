@@ -111,18 +111,33 @@ try {
     Write-Host ''
     Write-Host '正在推送...' -ForegroundColor Cyan
 
-    # git 把进度信息写到 stderr，PowerShell 会把它包成 ErrorRecord。
-    # 若因此让 $ErrorActionPreference='Stop' 生效，脚本会在推送【成功】之后
-    # 抛异常并 exit 1 —— 报的却是成功。所以这里：
-    #   1) 临时把偏好设为 Continue，避免 stderr 变成终止错误
-    #   2) 用 process 退出码判断成败，不看 stderr 有没有内容
-    $prevPref = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
-    $pushOut = (& git push $Remote $Branch 2>&1 | Out-String)
-    $pushCode = $LASTEXITCODE
-    $ErrorActionPreference = $prevPref
+    # git 把进度写到 stderr（"To github.com:... / * [new branch] ..."）。
+    # 直接 `git push 2>&1` 会让 PowerShell 把这些行包成 ErrorRecord 并染红打印，
+    # 看起来像失败 —— 而且 $ErrorActionPreference='Stop' 时还会在推送【成功】
+    # 之后抛异常、exit 1。
+    #
+    # 所以把两个流分别重定向到临时文件：PowerShell 就不会把子进程的 stderr
+    # 当错误，成败只看进程退出码。
+    $outFile = [System.IO.Path]::GetTempFileName()
+    $errFile = [System.IO.Path]::GetTempFileName()
+    $pushCode = 1
+    try {
+        $proc = Start-Process -FilePath 'git' `
+            -ArgumentList @('push', $Remote, $Branch) `
+            -NoNewWindow -Wait -PassThru `
+            -RedirectStandardOutput $outFile -RedirectStandardError $errFile
+        $pushCode = $proc.ExitCode
 
-    $pushOut -split "`n" | Where-Object { $_.Trim() } | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+        foreach ($stream in @($outFile, $errFile)) {
+            if (Test-Path $stream) {
+                Get-Content $stream -Encoding UTF8 | Where-Object { $_.Trim() } |
+                    ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+            }
+        }
+    }
+    finally {
+        Remove-Item $outFile, $errFile -Force -ErrorAction SilentlyContinue
+    }
 
     if ($pushCode -ne 0) {
         Write-Host ''
