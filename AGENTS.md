@@ -285,6 +285,8 @@ XML 属性名 = 部件类上的 C# 公共字段/属性名（吻合率 **100%**�
 ### 本机工具链的坑
 
 8. **含中文的 `.ps1` 被 `edit`/`write` 改过之后，BOM 会丢，脚本必崩。**
+   这条管的是**任何**含中文的 `.ps1` —— 不分目录、不分名字，`%TEMP%` 下的临时脚本一样算。
+   `write` **每次**都产出无 BOM 的 UTF-8，所以触发是必然的，不是偶然的。
    `powershell`（Windows PowerShell 5.1）在没有 BOM 时**按 ANSI 读 `.ps1`**，
    满文件中文被逐字节拆散，报错会指向一段**完全合法**的代码
    （例如 `Unexpected token '}'`），排查方向被彻底带偏。
@@ -293,17 +295,25 @@ XML 属性名 = 部件类上的 C# 公共字段/属性名（吻合率 **100%**�
    ```powershell
    ([System.IO.File]::ReadAllBytes('...\x.ps1')[0..2]) -join ','   # 应为 239,187,191
    ```
-   **修复**（改完 `.ps1` 立刻做，然后跑一次验证）：
+   **修复**（写完 `.ps1` 立刻做，然后跑一次验证）：
    ```powershell
    $f = '...\x.ps1'
    $raw = [System.IO.File]::ReadAllText($f, [System.Text.UTF8Encoding]::new($false))
    [System.IO.File]::WriteAllText($f, $raw, [System.Text.UTF8Encoding]::new($true))
    ```
-   本仓库里 `sync.ps1`、`publish.ps1`、`_tools\preflight.ps1` 都是含中文的 `.ps1`，
-   全都适用这一条。
+   `sync.ps1`、`publish.ps1`、`_tools\preflight.ps1` 是仓库里现成的三个例子，
+   但**规则不止于它们**。已犯过三次（`错误日志.md` 有记）——
+   前两次是 `sync.ps1` 和 `preflight.ps1`，第三次是临时脚本，
+   三次都是因为把这条规则的范围**读窄了**。
 
 9. **PowerShell 变量名大小写不敏感** —— 局部变量 `$status` 与参数 `[switch]$Status`
    是**同一个变量**，给它赋字符串会抛 `Cannot convert ... SwitchParameter`。命名时避开。
+
+10. **往 `publish.ps1` 传提交信息时，信息里不要带引号。**
+    它是 `[string]$Message`（单个位置参数），`powershell -File` 传参会按空格切分，
+    信息里出现 `"` 就会被拆成两个参数，报
+    `A positional parameter cannot be found that accepts argument '...'`。
+    多行信息用数组 + `` -join "`n" `` 拼好再传；中文没问题，引号才是杀手。
 
 更完整的坑与做法见 `Caves of Qud 模组制作入门指南.md`。
 
