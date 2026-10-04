@@ -110,10 +110,23 @@ try {
 
     Write-Host ''
     Write-Host '正在推送...' -ForegroundColor Cyan
+
+    # git 把进度信息写到 stderr，PowerShell 会把它包成 ErrorRecord。
+    # 若因此让 $ErrorActionPreference='Stop' 生效，脚本会在推送【成功】之后
+    # 抛异常并 exit 1 —— 报的却是成功。所以这里：
+    #   1) 临时把偏好设为 Continue，避免 stderr 变成终止错误
+    #   2) 用 process 退出码判断成败，不看 stderr 有没有内容
+    $prevPref = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     $pushOut = (& git push $Remote $Branch 2>&1 | Out-String)
-    if ($LASTEXITCODE -ne 0) {
+    $pushCode = $LASTEXITCODE
+    $ErrorActionPreference = $prevPref
+
+    $pushOut -split "`n" | Where-Object { $_.Trim() } | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
+
+    if ($pushCode -ne 0) {
+        Write-Host ''
         Write-Host '✗ 推送失败：' -ForegroundColor Red
-        $pushOut -split "`n" | Where-Object { $_.Trim() } | ForEach-Object { Write-Host "  $_" }
         Write-Host ''
         Write-Host '  常见原因：' -ForegroundColor Yellow
         Write-Host '    - 远程库还没建（去 https://github.com/new）'
@@ -121,7 +134,6 @@ try {
         Write-Host '    - 远程有本地没有的提交（先 git pull --rebase）'
         exit 1
     }
-    $pushOut -split "`n" | Where-Object { $_.Trim() } | ForEach-Object { Write-Host "  $_" -ForegroundColor DarkGray }
 
     $head = (& git log --oneline -1 2>&1 | Out-String).Trim()
     Write-Host ''
