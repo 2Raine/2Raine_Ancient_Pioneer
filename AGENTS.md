@@ -316,6 +316,17 @@ DSH 那边的工具**恰好也叫 `pwsh`**，但那是宿主自带的工具名�
     `A positional parameter cannot be found that accepts argument '...'`。
     多行信息用数组 + `` -join "`n" `` 拼好再传；中文没问题，引号才是杀手。
 
+11. **同名 `<part>` 是"合并"，不是"叠加"。** 一个蓝图里同名 `<part>` 只能有一个 ——
+    `Parts` 是 `Dictionary<string, GamePartBlueprint>`（按部件名索引）。子蓝图重写同名 part 时，
+    **只覆盖它写到的属性，没写到的保留祖先的值**（所以 `Tile` 会活下来）。
+    两个后果，都要记住：
+    - **想改继承来的部件属性** → 直接重写那个 part，只写要改的，其余自动保留。
+    - **同一个生物身上有两件出生装备时，必须用两个不同的部件名**，否则后写的会把先写的
+      整条吃掉，而**从游戏现象上看不出来**（本模组踩过：`A2Raine_BornEquipped` 装精灵石，
+      把父蓝图同一部件名装的头武器整条覆盖，雷电元素的 `Head` 槽空了很久没人发现）。
+    判据：`GameObjectBlueprint.cs:43` + `ObjectBlueprintLoader.cs:127`；
+    原版 5221 个带 `<part>` 的蓝图里 **4573 个**都依赖这个语义。详见笔记 〇之二十七。
+
 更完整的坑与做法见 `Caves of Qud 模组制作入门指南.md`。
 
 ---

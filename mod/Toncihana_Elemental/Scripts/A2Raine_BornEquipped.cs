@@ -74,6 +74,10 @@ namespace XRL.World.Parts
         /// </summary>
         public int SlotIndex = 0;
 
+        public string ExtraBlueprint;
+        public string ExtraSlot = "Floating Nearby";
+        public int ExtraSlotIndex = 0;
+
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade) || ID == AfterObjectCreatedEvent.ID;
@@ -101,7 +105,7 @@ namespace XRL.World.Parts
         /// Note the shape of the engine call: BodyPart.GetPart takes the required type AND the list to
         /// fill (there is no one-argument overload returning a list), so the list is built here.
         /// </summary>
-        private BodyPart FindSlot()
+        private BodyPart FindSlot(string slot, int slotIndex)
         {
             if (ParentObject == null || ParentObject.Body == null)
             {
@@ -113,45 +117,51 @@ namespace XRL.World.Parts
                 return null;
             }
 
-            List<BodyPart> parts = body.GetPart(Slot, new List<BodyPart>());
-            if (parts == null || SlotIndex < 0 || SlotIndex >= parts.Count)
+            List<BodyPart> parts = body.GetPart(slot, new List<BodyPart>());
+            if (parts == null || slotIndex < 0 || slotIndex >= parts.Count)
             {
                 return null;
             }
-            return parts[SlotIndex];
+            return parts[slotIndex];
         }
 
         private void EquipNow()
         {
-            if (string.IsNullOrEmpty(Blueprint) || ParentObject == null)
+            EquipOne(Blueprint, Slot, SlotIndex);
+            EquipOne(ExtraBlueprint, ExtraSlot, ExtraSlotIndex);
+        }
+
+        private void EquipOne(string blueprint, string slot, int slotIndex)
+        {
+            if (string.IsNullOrEmpty(blueprint) || ParentObject == null)
             {
                 return;
             }
 
             try
             {
-                GameObject item = GameObjectFactory.Factory.CreateObject(Blueprint);
+                GameObject item = GameObjectFactory.Factory.CreateObject(blueprint);
                 if (item == null)
                 {
                     UnityEngine.Debug.LogWarning("[Toncihana] BornEquipped: could not create '"
-                        + Blueprint + "'; is the blueprint name right?");
+                        + blueprint + "'; is the blueprint name right?");
                     return;
                 }
 
-                // Resolve the slot ourselves so SlotIndex can pick a specific part. When SlotIndex is
-                // 0 and the lookup fails we still fall through to ForceEquipObject(string), which is
-                // the engine's own path and covers any slot name we could not enumerate.
+                // Resolve the slot ourselves so SlotIndex can pick a specific part. When the lookup
+                // fails we still fall through to ForceEquipObject(string), which is the engine's own
+                // path and covers any slot name we could not enumerate.
                 bool worn = false;
-                if (!string.IsNullOrEmpty(Slot))
+                if (!string.IsNullOrEmpty(slot))
                 {
-                    BodyPart part = FindSlot();
+                    BodyPart part = FindSlot(slot, slotIndex);
                     if (part != null)
                     {
                         worn = ParentObject.ForceEquipObject(item, part, Silent: true);
                     }
                     else
                     {
-                        worn = ParentObject.ForceEquipObject(item, Slot, Silent: true);
+                        worn = ParentObject.ForceEquipObject(item, slot, Silent: true);
                     }
                 }
 
@@ -160,7 +170,7 @@ namespace XRL.World.Parts
                     // Slot missing, occupied, or the item refuses it: fall back to inventory so the
                     // item is at least not destroyed. It will be reachable by other means.
                     UnityEngine.Debug.LogWarning("[Toncihana] BornEquipped: could not wear '"
-                        + Blueprint + "' on slot '" + Slot + "' index " + SlotIndex + " for "
+                        + blueprint + "' on slot '" + slot + "' index " + slotIndex + " for "
                         + ParentObject.Blueprint + "; putting it in inventory instead.");
                     if (ParentObject.Inventory != null)
                     {
@@ -171,7 +181,7 @@ namespace XRL.World.Parts
             catch (Exception ex)
             {
                 UnityEngine.Debug.LogWarning("[Toncihana] BornEquipped failed for '"
-                    + Blueprint + "': " + ex);
+                    + blueprint + "': " + ex);
             }
         }
     }

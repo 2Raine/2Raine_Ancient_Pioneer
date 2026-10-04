@@ -2206,3 +2206,67 @@ Select-String -Path "...\2Raine_Toncihana_Bodies.xml","...\Creatures.xml" -Patte
 
 **绝对不要**：自己推一套模型 -> 拿它当事实 -> 再找证据维护它。
 mod 制作是说一不二的：是就是，不是就不是。
+
+---
+
+## 〇之二十七：传奇元素生物 —— 参数、以及"同名 part 会合并"这个会静默吃掉配置的坑
+
+### 一、设计参数
+
+| 项目 | 值 | 依据 |
+| --- | --- | --- |
+| 刷新 | 盐丘地表人口表 `SaltDesertPerSector`（`Load="Merge"`），`<object Weight="60" Number="1-2" Blueprint="2Raine_Elemental_Lightning" />` | 原版刷 `Dawnglider` 用的是同一张表 |
+| 传奇概率 | `Chance="5"`（百分数） | 原版档位：`GoatfolkParty` 的 `HeroOrNot` 组是 95/5；独立的 `Snapjaw Hero` 用 `Chance="3"` / `"5"` |
+| 提升函数 | `HeroMaker.MakeHero` | `qud_src\XRL\World\HeroMaker.cs` |
+| 传奇 HP | +20（`BonusHP`） | |
+| 传奇六维 | 各 +2（`AttributeBonus`） | |
+| 传奇突变 | `ElectricalGeneration` / `ElectromagneticPulse` → 2 级 | |
+| 传奇精灵石 | 多一颗（`ExtraItem`，占 `Floating Nearby` 索引 1） | |
+| 传奇颜色 | 引擎默认 `HeroNameColor="M"` / `HeroTileColor="&M"`（紫红） | `HeroMaker.cs:32-33`，**不用写代码** |
+| 传奇水仪式 | **关闭** —— 提升前设 `HeroNoWaterRitual="true"` | `HeroMaker.cs:314-317`：只有该值不是 `"true"` 时才 `AddPart(new GivesRep())`，而 `GivesRep` 是水仪式的**唯一**入口 |
+| 传奇对话 | 保留 —— `ConversationScript` 是 `MakeHero` 单独设的，不受上一条影响 | |
+| 普通元素生物 | **无名** | `GiveProperName` 只在 `HeroMaker.cs:214` 被调用（传奇）；`Species` 标签只提供命名匹配依据，不触发命名。`GiveProperName` 的全部调用点已逐条核对 |
+
+### 二、★★★ 同名 `<part>` 是"合并"，不是"叠加"
+
+**规则**：一个蓝图里同名 `<part>` 只能有一个。子蓝图再声明同一个名字时，
+**只覆盖它写到的属性，没写到的保留祖先的值**。
+
+三处独立证据：
+
+1. `qud_src\XRL\World\GameObjectBlueprint.cs:43` —— `Parts` 是
+   `Dictionary<string, GamePartBlueprint>`，**按键（部件名）索引**，同名即同一项。
+2. `qud_src\XRL\World\Loaders\ObjectBlueprintLoader.cs:127` —— `Merge` 是逐属性
+   `Attributes[k] = other.Attributes[k]`；`:612-614` 先 `Inherit`（父），
+   `:628-643` 再合并自身 → **子覆盖父**。
+3. 原版惯例：扫 `Base\ObjectBlueprints` 下 5221 个带 `<part>` 的蓝图，
+   **4573 个**都有"子重写祖先同名 part"（如 `BaseAntelope` 重写 `Brain` / `ConversationScript`）。
+   仓库里 `_tools\blueprint_chain.py` 的输出里也写着同一句。
+
+**它踩过的坑**：`2Raine_Elemental_Lightning` 用 `A2Raine_BornEquipped` 装精灵石，
+而父蓝图 `2Raine_Elemental_Body` 用**同一个部件名**装头武器 —— 于是头武器那条被整条覆盖，
+**雷电元素的 `Head` 槽一直是空的**，`2Raine_Elemental_HeadBlow_Lightning` 成了没人引用的孤儿蓝图。
+而"精灵石会掉在地上"这件事照样成立（覆盖后的 `Blueprint` 指向精灵石），
+**从现象上完全看不出问题**。
+
+### 硬性规则
+
+> **同一个生物身上的两件出生装备，必须走两个不同的部件名，或让一个部件支持多条目。**
+> 要给子蓝图换掉继承来的部件属性 → 直接重写那个 part，只写要改的属性（其余自动保留）。
+> **引入新部件前，先 grep 这个部件名在整条继承链上出现过几次。**
+
+### 三、修法与实测安排
+
+- `A2Raine_BornEquipped` **末尾追加** `ExtraBlueprint` / `ExtraSlot` / `ExtraSlotIndex`
+  （**字段只能追加**：插在中间会让老存档反序列化崩，见 〇之十八）
+- `2Raine_Elemental_Lightning` 重写同一个 part：头武器换 `2Raine_Elemental_HeadBlow_Lightning`，
+  精灵石走 `Extra*`
+- 实测：`Chance` 临时设 `100`，`Promote()` 里加一条 `[Toncihana] promoted ...` 日志，
+  进一次盐丘就能看到传奇。**测完必须把 `Chance` 改回 5**
+
+### 四、还没验证的
+
+- **引擎到底会给传奇生成什么名字**：`NameStyles.Generate` 依赖 `Species` / `Culture` /
+  `Mutations`，我们只给了 `<tag Name="Species" Value="elemental" />`。**未实测。**
+  备选是重建显式命名（曾写过 `QudishName`，抄原版 `Naming.xml` 的 Qudish 音素表，11:04 删掉了）。
+- 5% 概率下传奇的实际观感（等级、掉落、能不能对话）。

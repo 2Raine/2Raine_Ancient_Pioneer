@@ -48,10 +48,12 @@
         <mutation Name="ElectricalGeneration" Level="1" />
         <mutation Name="ElectromagneticPulse" Level="1" />
 
-        <part Name="A2Raine_BornEquipped" Blueprint="2Raine_SpiritStone_Lightning" Slot="Floating Nearby" SlotIndex="0" />
+        <part Name="A2Raine_BornEquipped"
+              Blueprint="2Raine_Elemental_HeadBlow_Lightning" Slot="Head"
+              ExtraBlueprint="2Raine_SpiritStone_Lightning" ExtraSlot="Floating Nearby" ExtraSlotIndex="0" />
 
         <part Name="A2Raine_LegendaryChance"
-              Chance="5"
+              Chance="100"
               BonusHP="20"
               AttributeBonus="2"
               BoostedMutationLevel="2"

@@ -120,6 +120,9 @@ namespace XRL.World.Parts
                 // The engine's own promotion. No-ops if the creature is already a hero.
                 HeroMaker.MakeHero(ParentObject);
 
+                UnityEngine.Debug.Log("[Toncihana] promoted " + ParentObject.Blueprint
+                    + " to legendary: " + ParentObject.DisplayName);
+
                 GiveExtraItem();
             }
             catch (Exception ex)
