@@ -120,8 +120,15 @@ namespace Toncihana
                 }
 
                 Mutations before = player.GetPart<Mutations>();
+
+                // Any character that is not ours reports every granted mutation as missing --
+                // the LOAD PROBLEM below said genotype='' on exactly such a save. Ask first.
+                bool ours = IsToncihana(player);
+
                 string report = "[Toncihana] LOAD DIAGNOSTIC"
                     + " | genotype='" + SafeGenotype(player) + "'"
+                    + " | ours=" + ours
+                    + " | physiology=" + player.HasPart<A2Raine_Toncihana_Physiology>()
                     + " | total-mutation-entries=" + entryCount
                     + " | mutations-part=" + (before != null);
 
@@ -156,7 +163,7 @@ namespace Toncihana
                 bool problem = !entryPresent || before == null;
                 foreach (string name in InnateMutations)
                 {
-                    if (!before.HasMutation(name))
+                    if (before == null || !before.HasMutation(name))
                     {
                         problem = true;
                     }
@@ -179,7 +186,7 @@ namespace Toncihana
                     }
                 }
 
-                if (problem)
+                if (problem && ours)
                 {
                     UnityEngine.Debug.LogWarning("[Toncihana] LOAD PROBLEM" + report);
                 }
