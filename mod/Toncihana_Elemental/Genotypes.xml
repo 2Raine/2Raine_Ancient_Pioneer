@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<genotypes>
+
+  <genotype Name="2Raine_AncientPioneer_Elemental"
+            MutationPoints="4"
+            StatPoints="44"
+            AllowedMutationCategories="*"
+            RandomWeight="0"
+            DisplayName="{{W|Ancient Pioneer}}"
+            Subtypes="2Raine_AncientPioneer_Callings"
+            Class=""
+            Tile="2Raine_Toncihana/race.png"
+            DetailColor="B"
+            BodyObject="2Raine_AncientPioneer_Body"
+            BaseHPGain="1-4"
+            BaseSPGain="50"
+            BaseMPGain="1"
+            Species="elemental"
+            IsMutant="true"
+            CharacterBuilderModules="XRL.CharacterBuilds.Qud.QudCasteModule,XRL.CharacterBuilds.Qud.QudCyberneticsModule">
+
+    <stat Name="Strength"     Minimum="10" Maximum="24" ChargenDescription="Your {{W|Strength}} score determines how effectively you penetrate your opponents' armor with melee attacks, how much damage your melee attacks do, your ability to resist forced movement, and your carry capacity."/>
+    <stat Name="Agility"      Minimum="10" Maximum="24" ChargenDescription="Your {{W|Agility}} score determines your accuracy with both melee and ranged weapons and your ability to dodge attacks."/>
+    <stat Name="Toughness"    Minimum="10" Maximum="24" ChargenDescription="Your {{W|Toughness}} score determines your number of hit points, your natural healing rate, and your ability to resist poison and disease."/>
+    <stat Name="Intelligence" Minimum="10" Maximum="24" ChargenDescription="Your {{W|Intelligence}} score determines your number of skill points and your ability to examine artifacts."/>
+    <stat Name="Willpower"    Minimum="10" Maximum="24" ChargenDescription="Your {{W|Willpower}} score modifies the cooldowns of your activated abilities, determines your ability to resist mental attacks, and modifies your natural healing rate."/>
+    <stat Name="Ego"          Minimum="10" Maximum="24" ChargenDescription="Your {{W|Ego}} score determines the potency of your mental mutations, your ability to haggle with merchants, and your ability to dominate the wills of other living creatures."/>
+
+    <skills>
+      <skill Name="Tactics_Run" />
+      <skill Name="Survival_Camp" />
+      <skill Name="CookingAndGathering_MealPreparation" />
+    </skills>
+
+    <reputations>
+      <reputation With="Entropic" Value="200" />
+    </reputations>
+
+    <extrainfo>Mutations</extrainfo>
+    <extrainfo>Begins with the {{C|Stormcharge}} mutation and {{G|Regeneration}}</extrainfo>
+    <extrainfo>+200 reputation with {{C|highly entropic beings}}</extrainfo>
+  </genotype>
+
+</genotypes>

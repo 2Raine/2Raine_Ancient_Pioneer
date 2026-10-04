@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<conversations>
+
+  <conversation ID="2Raine_Toncihana_Keeper">
+    <start ID="HarvestGreeting">
+      <text>You -- wait. *Wait.* Stand still a moment, friend, I want to be sure.</text>
+      <text>The priest fumbles a book out of his satchel with hands that shake, and holds it up at arm's length. The pages are warm. He does not seem surprised. He seems like a man who has been waiting a very long time and has run out of ways to say so.</text>
+      <text>*There.* It is you. Eleven years, and it is *you.*</text>
+      <text>Forgive me, I have to sit. The knees went years ago and the rest is following.</text>
+      <choice Target="HarvestRecite">Eleven years of what?</choice>
+      <choice Target="End">Live and drink.</choice>
+    </start>
+
+    <node ID="HarvestRecite">
+      <text>A book that would not stop pointing. I followed it out of my own barley field and across a great deal of ground I would not care to walk again. It went warm at night and it pointed, and I went where it pointed, and it pointed *here.*</text>
+      <text>I will be honest with you: I did not think I would live to see the end of the walk. I cough in the mornings now, and my hands are not good, and I have been eating worse than my own goats.</text>
+      <text>But I am a priest of the Harvest, and I know what to do with a field that has finally ripened. Sit a moment. Let me say it properly.</text>
+      <choice Target="HarvestGiven">I am listening.</choice>
+      <choice Target="End">Some other time.</choice>
+    </node>
+
+    <node ID="HarvestGiven">
+      <text>He closes his eyes and recites. Not the words you would expect from a farmer -- older than that, and heavier, and he does not stumble over any of it.</text>
+      <text>The air over his hands begins to curdle. Thin grey light comes off the recitation the way steam comes off a kettle, gathers between his palms, and folds itself flat, and keeps folding, until it is a book.</text>
+      <text>He opens his eyes and holds it out. He is smiling, and he is tired, and the smile is not entirely for you.</text>
+      <text>*There.* As many as you need. It was never the paper that mattered.</text>
+      <choice Target="End" GiveItem="2Raine_ThunderBook">Take it.</choice>
+      <choice Target="End">Not yet.</choice>
+    </node>
+  </conversation>
+
+</conversations>

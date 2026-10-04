@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<subtypes>
+
+  <class ID="2Raine_AncientPioneer_Callings" ChargenTitle="choose calling" SingularTitle="calling" StatBoxDisplay="true">
+
+    <subtype Name="2Raine_Toncihana_Elemental"
+             DisplayName="{{C|Toncihana}}"
+             Gear="2Raine_Toncihana_ElementalGear"
+             BodyObject="2Raine_Toncihana_Body"
+             Tile="2Raine_Toncihana/race.png"
+             DetailColor="B">
+
+      <skills>
+        <skill Name="A2Raine_Toncihana_StormCalling" />
+      </skills>
+
+      <extrainfo>{{C|Gathered charge}} instead of blood</extrainfo>
+      <extrainfo>Half {{W|physical}} damage; double {{R|fire}} and {{C|cold}} damage</extrainfo>
+      <extrainfo>Immune to {{C|electricity}} and {{G|poison}}</extrainfo>
+      <extrainfo>Natural healing rises and falls with stored {{C|charge}}</extrainfo>
+      <extrainfo>Metallic missiles may glance off your {{C|charge-field}}</extrainfo>
+
+    </subtype>
+
+  </class>
+
+</subtypes>

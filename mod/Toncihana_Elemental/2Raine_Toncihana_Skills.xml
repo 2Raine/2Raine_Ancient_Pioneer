@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<skills>
+  <skill Name="A2Raine_Toncihana_StormCalling"
+         Class="A2Raine_Toncihana_StormCalling"
+         Cost="0"
+         Attribute="Willpower"
+         Snippet="calling the storm"
+         Description="The current answers you. You have four innate abilities: Thunder Lord's Decree, Thunder-Fire, Thunder Step and Lightning Snake."
+         Tile="Mutations/electrical_generation.bmp"
+         Foreground="c"
+         Detail="W">
+
+    <power Name="A2Raine_Toncihana_ThunderLordDecree"
+           Class="A2Raine_Toncihana_ThunderLordDecree"
+           Cost="0"
+           Attribute="Willpower"
+           Minimum="0"
+           Snippet="speaking with the storm's authority"
+           Description="Toggle. While on, every melee attack carries extra electric damage and may paralyze what it strikes. Damage and paralysis chance grow with your character level."
+           Tile="Mutations/electrical_generation.bmp"
+           Foreground="c"
+           Detail="W" />
+
+    <power Name="A2Raine_Toncihana_ThunderFire"
+           Class="A2Raine_Toncihana_ThunderFire"
+           Cost="0"
+           Attribute="Willpower"
+           Minimum="0"
+           Snippet="kindling with current"
+           Description="Choose an adjacent square, then type how much stored charge to burn, to instantly heat one object there. There is no cap beyond the charge you actually hold. 100 charge buys 5 degrees."
+           Tile="Mutations/flaming_ray.bmp"
+           Foreground="R"
+           Detail="R" />
+
+    <power Name="A2Raine_Toncihana_ThunderStep"
+           Class="A2Raine_Toncihana_ThunderStep"
+           Cost="0"
+           Attribute="Willpower"
+           Minimum="0"
+           Snippet="stepping as current"
+           Description="Spend a fifth of your maximum charge to strike any square you can see and then trade places with whatever stands there. Cooldown 30 rounds."
+           Tile="Mutations/electrical_generation.bmp"
+           Foreground="c"
+           Detail="C" />
+
+    <power Name="A2Raine_Toncihana_LightningSnake"
+           Class="A2Raine_Toncihana_LightningSnake"
+           Cost="0"
+           Attribute="Willpower"
+           Minimum="0"
+           Snippet="loosing serpents of current"
+           Description="Spend 1000 charge to loose serpents of electricity into the adjacent square in a chosen direction. Their number and damage grow with your character level, and the extras leap onward to nearby targets."
+           Tile="Mutations/electrical_generation.bmp"
+           Foreground="c"
+           Detail="c" />
+
+    <power Name="A2Raine_Toncihana_ThunderBreath"
+           Class="A2Raine_Toncihana_ThunderBreath"
+           Cost="0"
+           Attribute="Willpower"
+           Minimum="0"
+           Snippet="exhaling the storm"
+           Description="Exhale a fan of current five squares long and sixty degrees wide. Costs a fifth of your maximum charge and deals 1d4 electric damage per 500 charge spent, to everything the fan touches. The current does not arc onward."
+           Tile="Mutations/electrical_generation.bmp"
+           Foreground="c"
+           Detail="C" />
+
+  </skill>
+</skills>

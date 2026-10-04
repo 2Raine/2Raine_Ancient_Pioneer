@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<factions>
+
+  <faction Name="Elementals" InitialPlayerReputation="0">
+    <feeling About="*" Value="0" />
+  </faction>
+
+  <faction Name="Beasts">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Plants">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Humanoids">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="GerminatedPlants">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Mean">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Snapjaws">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Baboons">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Arachnids">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Robots">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Girsh">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Templar">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Mamon">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="Seekers">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="SultanCult1">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="SultanCult2">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="SultanCult3">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="SultanCult4">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+  <faction Name="SultanCult5">
+    <feeling About="Elementals" Value="0" />
+  </faction>
+
+</factions>

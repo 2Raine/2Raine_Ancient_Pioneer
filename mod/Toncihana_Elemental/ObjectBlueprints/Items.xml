@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  <object Name="2Raine_MagicTome" Inherits="BaseMissileWeapon">
+    <tag Name="BaseObject" Value="*noinherit" />
+
+    <part Name="Render" DisplayName="magic tome" Tile="Items/sw_book_1.bmp"
+          ColorString="&amp;W" DetailColor="W" />
+
+    <part Name="Description" Short="A tome bound in something that was never alive." />
+
+    <part Name="MissileWeapon" Skill="Pistol" AmmoChar="&amp;Y*"
+          ShotsPerAction="1" AmmoPerAction="1" ShotsPerAnimation="1"
+          WeaponAccuracy="0" MaxRange="40" />
+
+    <part Name="Physics" Weight="2" />
+    <part Name="Commerce" Value="500" />
+    <part Name="Examiner" Complexity="4" />
+    <tag Name="Tier" Value="4" />
+
+    <part Name="CooldownAmmoLoader" Cooldown="10" Readout="true"
+          ProjectileObject="2Raine_LightningBolt" />
+  </object>
+
+  <object Name="2Raine_LightningTome" Inherits="2Raine_MagicTome">
+    <part Name="Render" DisplayName="tome of {{W|Lightning}}" Tile="Items/sw_book_1.bmp"
+          ColorString="&amp;W" DetailColor="Y" />
+
+    <part Name="Description" Short="The pages refuse to lie flat. A dry crackling runs along the spine, and the ink has dried the colour of a storm." />
+
+    <part Name="CooldownAmmoLoader" Cooldown="2" Readout="true"
+          ProjectileObject="2Raine_LightningBolt" />
+
+    <tag Name="MissileFireSound" Value="Sounds/Missile/Fires/Pistols/sfx_missile_arcWinder_fire" />
+    <tag Name="ReloadSound" Value="Sounds/Missile/Reloads/sfx_missile_arcWinder_reload" />
+  </object>
+
+  <object Name="2Raine_LightningBolt" Inherits="ProjectileElectroPistol">
+    <part Name="DischargeOnHit" DamageRange="3d6" Voltage="6" />
+  </object>
+
+  <object Name="2Raine_ThunderBook" Inherits="Book">
+    <part Name="Render" DisplayName="The {{W|Thunder Book}}" Tile="Items/sw_book_4.bmp"
+          ColorString="&amp;B" DetailColor="c" />
+
+    <part Name="Description" Short="Cutwater-blue boards are sewn over with bast thread, and the pages smell faintly of ozone. Something inside is still deciding whether to be a book." />
+
+    <part Name="Book" ID="2Raine_ThunderBook" />
+
+    <part Name="Physics" Weight="1" />
+
+    <part Name="Commerce" Value="0.01" />
+
+    <tag Name="Tier" Value="2" />
+  </object>
+
+  <object Name="2Raine_SpiritStone" Inherits="Floating Glowsphere">
+    <part Name="Render" DisplayName="spirit stone" RenderString="*" RenderLayer="5"
+          Tile="Items/sw_glowsphere.bmp" ColorString="&amp;W" DetailColor="W" />
+
+    <part Name="Description" Short="A shard of standing weather, rounded the way a river rounds a stone. It is warm, and it is heavier than its size has any right to be." />
+
+    <part Name="LightSource" Lit="true" Radius="2" />
+
+    <part Name="Commerce" Value="10" />
+
+    <part Name="AnimatedMaterialGeneric" AnimationLength="200"
+          ColorStringAnimationFrames="0=&amp;W,66=&amp;Y,132=&amp;w" />
+
+    <part Name="Food" Satiation="Snack" Thirst="0" Healing="0"
+          Message="It dissolves on your tongue and is simply gone." />
+
+    <part Name="PreservableItem" Result="2Raine_SpiritStonePowder" Number="3" />
+
+    <tag Name="Tier" Value="4" />
+    <tag Name="ChooseToPreserve" />
+  </object>
+
+  <object Name="2Raine_SpiritStone_Lightning" Inherits="2Raine_SpiritStone">
+    <part Name="Render" DisplayName="{{W|lightning}} spirit stone"
+          ColorString="&amp;W" DetailColor="c" />
+
+    <part Name="Description" Short="A shard of standing weather, rounded the way a river rounds a stone. Something inside it is still counting the seconds between itself and the ground." />
+
+    <part Name="AnimatedMaterialGeneric" AnimationLength="120"
+          ColorStringAnimationFrames="0=&amp;W,40=&amp;C,80=&amp;c" DetailColorAnimationFrames="0=c,40=W,80=&amp;Y" />
+
+    <part Name="PreservableItem" Result="2Raine_SpiritStonePowder_Lightning" Number="3" />
+  </object>
+
+  <object Name="2Raine_SpiritStonePowder" Inherits="Preservable">
+    <part Name="Render" DisplayName="spirit stone powder" RenderString="%" RenderLayer="5"
+          Tile="Items/sw_paste.bmp" ColorString="&amp;B" TileColor="&amp;b" DetailColor="C" />
+
+    <part Name="Description" Short="What a spirit stone leaves behind once the weather has been salted out of it: a fine, faintly warm grit that tastes of the moment before a strike." />
+
+    <part Name="Commerce" Value="8" />
+
+    <part Name="PreparedCookingIngredient" type="electric" charges="1" />
+  </object>
+
+  <object Name="2Raine_SpiritStonePowder_Lightning" Inherits="2Raine_SpiritStonePowder">
+    <part Name="Render" DisplayName="{{W|lightning}} spirit stone powder"
+          ColorString="&amp;W" TileColor="&amp;c" DetailColor="C" />
+
+    <part Name="Description" Short="What a lightning spirit stone leaves behind once the weather has been salted out of it: a fine, faintly warm grit that tastes of the moment before a strike." />
+  </object>
+
+</objects>

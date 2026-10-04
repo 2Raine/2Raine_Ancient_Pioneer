@@ -1,0 +1,8 @@
+{
+    "ID": "2Raine_Toncihana_Elemental",
+    "Title": "{{W|Toncihana}} {{C|the Storm-Caller}}",
+    "Description": "Adds the playable {{W|Elemental}} genotype {{W|Toncihana}} (锺起唤): a being of gathered charge whose blood is current. Halves physical damage, doubles fire and cold damage, is immune to electricity and poison, deflects metallic missiles, and whose natural healing waxes and wanes with its stored charge. Comes with four innate abilities and a Stormcharge mutation that charges twice as fast.",
+    "Version": "0.1.0",
+    "Author": "2Raine",
+    "Tags": "Genotype, Subtype, Mutation, Creature"
+}

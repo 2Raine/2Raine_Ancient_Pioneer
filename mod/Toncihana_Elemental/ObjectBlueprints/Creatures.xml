@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+    <object Name="2Raine_Elemental" Inherits="2Raine_Elemental_Body">
+    	<part Name="Description" Short="A knot of standing current wearing the loose shape of a person. It has a face, and the face is trying to decide whether it is a courtesy or a warning." />
+
+    	<part Name="Render" DisplayName="elemental" Tile="2Raine_Elemental/elemental_base.png" ColorString="&amp;B" DetailColor="Y" />
+
+    	<stat Name="Strength" Value="10" />
+    	<stat Name="Agility" Value="10" />
+    	<stat Name="Toughness" Value="10" />
+    	<stat Name="Intelligence" Value="10" />
+    	<stat Name="Willpower" Value="16" />
+    	<stat Name="Ego" Value="10" />
+
+    	<stat Name="Hitpoints" Value="10" />
+    	<stat Name="MoveSpeed" Value="50" />
+
+    	<stat Name="DV" Value="10" />
+    	<stat Name="AV" Value="0" />
+
+    	<part Name="MentalShield" />
+
+    	<skill Name="Cudgel" />
+
+    	<tag Name="Species" Value="elemental" />
+    </object>
+
+    <object Name="2Raine_Elemental_HeadBlow" Inherits="NaturalWeapon">
+    	<part Name="Render" DisplayName="head-blow" Tile="Creatures/natural-weapon-fist.bmp" ColorString="&amp;c" DetailColor="C" />
+
+    	<part Name="Description" Short="The loose shape of a head gathers itself into a blunt knot of standing weather." />
+
+    	<part Name="MeleeWeapon" Slot="Head" BaseDamage="1d2-1" Skill="Cudgel" Stat="Strength" MaxStrengthBonus="1000" />
+
+    	<part Name="ElementalDamage" Damage="0" Attributes="Electric" />
+
+    	<tag Name="SwingSound" Value="sfx_melee_naturalWeapon_fist_swing" />
+    	<tag Name="BlockedSound" Value="sfx_melee_naturalWeapon_fist_blocked" />
+    </object>
+
+    <object Name="2Raine_Elemental_HeadBlow_Lightning" Inherits="2Raine_Elemental_HeadBlow">
+    	<part Name="Render" DisplayName="{{W|charged}} head-blow" ColorString="&amp;W" DetailColor="c" />
+    	<part Name="ElementalDamage" Damage="1d4" Attributes="Electric" />
+    </object>
+
+    <object Name="2Raine_Elemental_Lightning" Inherits="2Raine_Elemental" >
+        <part Name="Render" DisplayName="{{W|lightning}} Elemental" Tile="2Raine_Elemental/elemental_base.png" ColorString="&amp;W" DetailColor="c" />
+        <mutation Name="ElectricalGeneration" Level="1" />
+        <mutation Name="ElectromagneticPulse" Level="1" />
+
+        <part Name="A2Raine_BornEquipped" Blueprint="2Raine_SpiritStone_Lightning" Slot="Floating Nearby" SlotIndex="0" />
+
+        <part Name="A2Raine_LegendaryChance"
+              Chance="5"
+              BonusHP="20"
+              AttributeBonus="2"
+              BoostedMutationLevel="2"
+              ExtraItem="2Raine_SpiritStone_Lightning"
+              ExtraItemSlot="Floating Nearby"
+              ExtraItemSlotIndex="1" />
+    </object>
+
+    <object Name="2Raine_Toncihana_Keeper" Inherits="NPC">
+    	<part Name="Render" DisplayName="Osheb, priest of the Harvest" Tile="Creatures/npc-irudad.bmp" ColorString="&amp;c" TileColor="&amp;c" DetailColor="W" RenderString="f" />
+    	<part Name="Description" Short="A road-worn priest with a harvesting hook rusted to the shape of his own grip and a satchel of seed-counters gone soft with rain. He has walked a long way to stand in this one spot, and he will tell you why if you ask." />
+
+    	<part Name="ConversationScript" ConversationID="2Raine_Toncihana_Keeper" />
+
+    	<part Name="Brain" Wanders="false" Mobile="false" Factions="Joppa-100" />
+
+    	<part Name="Interesting" />
+    	<part Name="AISelfPreservation" Threshold="40" />
+
+    	<stat Name="Hitpoints" Value="40" />
+    	<stat Name="Level" Value="4" />
+    	<stat Name="Ego" Boost="1" />
+    </object>
+</objects>

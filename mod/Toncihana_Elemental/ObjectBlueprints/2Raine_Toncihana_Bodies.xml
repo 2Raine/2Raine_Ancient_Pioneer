@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  <object Name="2Raine_Elemental_Body" Inherits="Creature">
+    <part Name="Render"
+          RenderString="@"
+          DisplayName="elemental"
+          Tile="2Raine_Elemental/elemental_base.png"
+          ColorString="&amp;W"
+          DetailColor="W" />
+
+    <part Name="Body" Anatomy="2Raine_Elemental" />
+
+    <part Name="Brain" Hostile="false" Wanders="true" Factions="Elementals-100" />
+
+    <part Name="A2Raine_BornEquipped" Blueprint="2Raine_Elemental_HeadBlow" Slot="Head" />
+
+    <tag Name="BaseObject" Value="*noinherit" />
+  </object>
+
+  <object Name="2Raine_AncientPioneer_Body" Inherits="Humanoid">
+    <part Name="Render"
+          RenderString="@"
+          DisplayName="ancient pioneer"
+          Tile="2Raine_Toncihana/body.png"
+          ColorString="&amp;W"
+          DetailColor="Y" />
+
+    <inventoryobject Blueprint="Chem Cell" Number="1" />
+    <inventoryobject Blueprint="Copper Nugget" Number="1-2" />
+
+    <tag Name="BaseObject" Value="*noinherit" />
+  </object>
+
+  <object Name="2Raine_Toncihana_Body" Inherits="2Raine_AncientPioneer_Body">
+    <part Name="Render"
+          DisplayName="elemental"
+          ColorString="&amp;B" />
+
+    <part Name="A2Raine_Toncihana_Physiology" />
+
+    <part Name="DisabledNaturalHealing" />
+
+    <intproperty Name="Bleeds" Value="0" />
+    <tag Name="BleedLiquid" Value="warmstatic-1000" />
+    <tag Name="BleedColor" Value="&amp;Y" />
+    <tag Name="BleedPrefix" Value="{{Y|arcing}}" />
+
+    <stat Name="ElectricResistance" Value="100" />
+    <part Name="ElectricImmunity" />
+    <stat Name="HeatResistance" Value="0" />
+    <stat Name="ColdResistance" Value="0" />
+
+    <part Name="GasImmunity" GasType="PoisonGas" />
+    <part Name="EffectResistance" Values="Poison,Poisoned,PoisonGasPoison,PhasePoisoned,StingerPoisoned,AshPoison,BasiliskPoison,SporeCloudPoison" />
+  </object>
+
+</objects>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<populations>
+
+  <population Name="2Raine_AncientPioneer_CommonGear">
+    <group Name="Items" Style="pickeach">
+      <table Name="StartingGear_Common" />
+      <object Blueprint="HalfFullWaterskin" Number="1" />
+      <object Blueprint="Crude Toga" Number="1" />
+      <object Blueprint="Goat Jerky" Number="8-10" />
+    </group>
+  </population>
+
+  <population Name="2Raine_Toncihana_ElementalGear">
+    <group Name="Items" Style="pickeach">
+      <table Name="2Raine_AncientPioneer_CommonGear" />
+      <object Blueprint="Solar Cell" Number="1" />
+      <object Blueprint="Dagger2" Number="1" />
+    </group>
+  </population>
+
+  <population Name="SaltDesertPerSector" Load="Merge">
+    <group Name="Creatures" Style="pickone" Load="Merge">
+      <object Weight="60" Number="1-2" Blueprint="2Raine_Elemental_Lightning" />
+    </group>
+  </population>
+
+</populations>

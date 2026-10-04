@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mutations Hidden="true" ExcludeFromPool="true">
+  <category Name="Physical">
+
+    <mutation Name="A2Raine_Toncihana_Stormcharge"
+              DisplayName="Stormcharge"
+              Cost="4"
+              MaxSelected="1"
+              Class="A2Raine_Toncihana_Stormcharge"
+              Exclusions="Electrical Generation"
+              BearerDescription="those who brim with storm-charge"
+              Tile="Mutations/electrical_generation.bmp" />
+
+  </category>
+</mutations>

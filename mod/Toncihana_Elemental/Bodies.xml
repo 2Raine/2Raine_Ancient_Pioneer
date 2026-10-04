@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<bodies>
+
+  <anatomies>
+
+    <anatomy Name="2Raine_Elemental" Category="Protoplasmic">
+      <part Type="Head">
+        <part Type="Face" />
+      </part>
+      <part Type="Missile Weapon" Laterality="Right" />
+      <part Type="Missile Weapon" Laterality="Left" />
+      <part Type="Floating Nearby" />
+      <part Type="Floating Nearby" />
+    </anatomy>
+
+  </anatomies>
+
+</bodies>
