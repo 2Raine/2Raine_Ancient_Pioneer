@@ -29,4 +29,21 @@
     </node>
   </conversation>
 
+  <conversation ID="2Raine_Toncihana_Elemental">
+    <start ID="ElementalSense">
+      <text>The current stops moving the way a current moves. It gathers, and holds a shape it was not holding a moment ago, and the shape is roughly the shape of a person standing very still.</text>
+      <text>A sound comes off it. Not speech, exactly -- closer to the ringing a struck wire leaves behind, as if the wire had learned one word and were proud of it.</text>
+      <text>&amp;W*Hhhhhhhrrrr.*&amp;y</text>
+      <choice Target="ElementalAlmost">You can speak?</choice>
+      <choice Target="End">Live and drink.</choice>
+    </start>
+
+    <node ID="ElementalAlmost">
+      <text>&amp;W*...hhh...*&amp;y It tries again. The second attempt is worse than the first, which it does not appear to notice.</text>
+      <text>The face it has assembled is doing the thing a face does when it is trying to remember how far down a chin is supposed to go.</text>
+      <text>&amp;W*Hhhrr. Wwww...*&amp;y</text>
+      <choice Target="End">Take your time.</choice>
+    </node>
+  </conversation>
+
 </conversations>

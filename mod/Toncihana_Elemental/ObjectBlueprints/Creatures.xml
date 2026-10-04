@@ -48,12 +48,14 @@
         <mutation Name="ElectricalGeneration" Level="1" />
         <mutation Name="ElectromagneticPulse" Level="1" />
 
+        <tag Name="HeroConversation" Value="2Raine_Toncihana_Elemental" />
+
         <part Name="A2Raine_BornEquipped"
               Blueprint="2Raine_Elemental_HeadBlow_Lightning" Slot="Head"
               ExtraBlueprint="2Raine_SpiritStone_Lightning" ExtraSlot="Floating Nearby" ExtraSlotIndex="0" />
 
         <part Name="A2Raine_LegendaryChance"
-              Chance="100"
+              Chance="5"
               BonusHP="20"
               AttributeBonus="2"
               BoostedMutationLevel="2"
