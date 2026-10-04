@@ -30,12 +30,21 @@
   config:
     maxBytes: 65536
 
-# 强制工作流注入（本预设的主要新增）
+# 强制工作流门禁（本预设的主要新增）
+# 它不只是注入文本：注册 3 个工具 + 一个单调 guard，改受保护区域前必须先交计划回执。
+# workspace 是门禁的作用域 —— 工作目录不在这个路径下的会话，插件完全静默。
 - id: qa-mod-workflow
   name: ./qa-mod-workflow.mjs
   config:
     enabled: true
-    order: -100
+    workspace: 'D:\caves of qud 模组制作'
+    protectedPrefixes:
+      - 'mod\'
+      - '_tools\'
+      - 'sync.ps1'
+      - 'publish.ps1'
+    planTtlMinutes: 240
+    requireGitClean: true
 
 # ── shell ───────────────────────────────────────────────────────────────────
 

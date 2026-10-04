@@ -13,9 +13,37 @@
 | --- | --- | --- | --- |
 | **1. 本文件** | `AGENTS.md` | **每次对话的第一次请求**自动注入，之后常驻历史直到上下文压缩 | 参考材料语气，可被忽略 |
 | **2. 预检脚本** | `_tools\preflight.ps1` | 我主动跑；`after` 会实际执行全部校验并 `exit 1` | 把跳过变成显式动作 |
-| **3. 插件预设** | `~\.dsh\.agent-presets\modder\` | 会话选用该预设时，工作流作为 **system-prompt 的一个 section** 注入 | 命令式，与 persona 同级 |
+| **3. 插件门禁** | `~\.dsh\.agent-presets\modder\qa-mod-workflow.mjs` | 会话选用 `Modder (Qud)` 预设时**由引擎强制** | **硬拦截**，不是建议 |
 
-**第 1 层已经生效，不需要你做任何事。** 第 3 层要你选用 `Modder (Qud)` 预设。
+**第 1 层已经生效，不需要你做任何事。** 第 3 层要你在**新会话里、发第一条消息之前**选用
+`Modder (Qud)` 预设 —— 预设一旦开过一轮就锁定了（`agent-preset/locked`），中途换不了。
+
+### 第 3 层到底拦什么
+
+插件把工作流接到了引擎真正的决策点上，靠的是 `ctx.tools.guard()` —— 它是**单调**的，
+任何后续监听器都不能把一次拒绝翻回放行：
+
+- **没交计划回执就改受保护区域 → 写入被拒绝**，并告诉你缺什么。
+  受保护区域：`mod\`、`_tools\`、`sync.ps1`、`publish.ps1`。
+- 受保护区域**之外**的写入（笔记、文档、临时文件）一律放行 —— 门禁只拦该拦的。
+- 回执由 `workflow_plan` 提交，里面记下下面这一节必读材料的 **SHA256 指纹**。
+- **任意一份材料被改动，回执立刻作废**，必须重读再交。错误日志也算一份 ——
+  所以"犯错 → 记进错误日志 → 旧回执作废 → 下次必须重读"是一条自动闭环。
+- 我动了工作区文件却没提交，**回合结束时会被点名**（读 `git status --porcelain`，只看退出码）。
+
+三个工具：`workflow_status`（看当前状态与被拦原因）、`workflow_plan`（交计划）、
+`workflow_mistake`（记错误）。被拦下时先跑 `workflow_status`。
+
+### 必读材料（机器读，改这一节就改了门禁）
+
+插件解析下表决定"必读"是哪些文件。增删行即可改门禁，**不需要动插件代码**：
+
+| 文件 | 作用 |
+| --- | --- |
+| `AGENTS.md` | 工作流与铁律 |
+| `Caves of Qud 模组制作入门指南.md` | Wiki 整理教程，含大量更正标注 |
+| `Qud机制数据库_使用说明.md` | `qud.py` 的完整用法 |
+| `Toncihana_制作笔记与调参参考.md` | 本模组设计记录与踩坑，改数值前必读 |
 
 ```powershell
 # 开工前
@@ -24,13 +52,17 @@ pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" before
 # 交付前（全跑一遍校验，不通过就 exit 1 —— 那时不许声称完成）
 pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" after
 
-# 犯错后立刻记一条
+# 犯错后立刻记一条（和第 3 层的 workflow_mistake 等价）
 pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" mistake "一句话描述这次错误"
 pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" log
 ```
 
-**犯错后的固定动作**：先 `mistake` 记进 `错误日志.md`，再判断这条错误是否暴露了流程漏洞；
-**如果是，当场把它变成下面第〇节里的一条规则** —— 规则写进不会自动加载的文件等于没写。
+**犯错后的固定动作**：先 `mistake`（或 `workflow_mistake`）记进 `错误日志.md`，
+再判断这条错误是否暴露了流程漏洞；**如果是，当场把它变成下面第〇节里的一条规则** ——
+规则写进不会自动加载的文件等于没写。
+
+**验收第 3 层是否真的加载了**：在新会话里说"跑 workflow_status"。工具不存在 =
+插件没加载 = 该会话没有门禁（AGENTS.md 里说"三层"时要说清实际生效的是前两层）。
 
 ---
 
@@ -342,6 +374,18 @@ publish.ps1                  提交 + 推送到 GitHub
 根                           设计笔记、错误日志.md、AGENTS.md、README.md
 qud_db/  qud_src/            重建产物，已 .gitignore（重建法见 README）
 ```
+
+**第 3 层插件的回归测试**（改了 `qa-mod-workflow.mjs` 必须重跑）：
+
+```powershell
+node "D:\caves of qud 模组制作\_tools\qa-mod-workflow.smoke.mjs"   # 35 项，全过才 exit 0
+```
+
+它用 mock 的 `ctx` 覆盖放行/拦截/回执失效/跨会话/跨工作区/禁用开关六类路径，
+**不需要启动 DSH**。改插件后如果这里退化了，门禁要么失效要么误拦，两种都糟。
+
+**门禁状态不在仓库里**：回执、计划流水、动过文件的记录都写在
+`~\.dsh\dsh-qa-mod-workflow\<工作区哈希>\`，工作区保持干净。
 
 **游戏从它自己的目录加载模组**，所以改完必须同步：
 
