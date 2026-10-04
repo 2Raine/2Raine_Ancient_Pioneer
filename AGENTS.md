@@ -66,35 +66,35 @@ pwsh -File "D:\caves of qud 模组制作\_tools\preflight.ps1" log
 
 ```powershell
 # 0) 赋值（每个新会话都要重来一次）
+#    仓库根 = 工作区根，所以只有一个 $ws
 $py = "C:\Users\16064\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe"
 $q  = "D:\caves of qud 模组制作\_tools\qud.py"
 $ws = "D:\caves of qud 模组制作"
-$repo = "$ws\2Raine_Ancient_Pioneer"
 
 # 1) 动手前：查机制 / 看原版
 & $py $q mech <你要用的部件>
 # 或直接在源码里找惯例
 Select-String -Path "$ws\qud_src\XRL\World\ZoneBuilders\*.cs" -Pattern "GetCell"
 
-# 2) 改代码（在仓库里改，不要在游戏目录里改）
-#    仓库是真源：$repo\mod\Toncihana_Elemental\
-#    游戏目录是部署目标：%USERPROFILE%\AppData\LocalLow\Freehold Games\CavesOfQud\Mods\Toncihana_Elemental\
+# 2) 改代码：改 $ws\mod\Toncihana_Elemental\ 下的文件
+#    那是真源。游戏目录只是部署目标：
+#    %USERPROFILE%\AppData\LocalLow\Freehold Games\CavesOfQud\Mods\Toncihana_Elemental\
 
-# 3) 同步 + 编译校验（不启动游戏，约 10 秒）
-powershell -File "$repo\sync.ps1" push
-powershell -File "$ws\_tools\check_csharp.ps1"      # exit=0 才算过
-Get-Content "$env:TEMP\qud_api\csc_out.txt" | Select-String error
+# 3) 同步 + 全套校验（不启动游戏）
+cd $ws
+pwsh -File sync.ps1 push
+pwsh -File _tools\preflight.ps1 after     # 编译 + XML/引用校验 + 日志 + git 状态，给结论
+#    单独跑也可以：
+#    powershell -File "$ws\_tools\check_csharp.ps1"      # exit=0 才算过
+#    & $py "$ws\_tools\validate_mod.py"                  # 结构/命名/部件命名空间/解剖类别
+#    & $py "$ws\_tools\audit_references.py"              # 按引擎真实解析路径核对引用
 
-# 4) XML / 引用校验
-& $py "$ws\_tools\validate_mod.py"        # 结构、命名、部件命名空间、解剖类别
-& $py "$ws\_tools\audit_references.py"    # 按引擎真实解析路径核对每一类引用
-
-# 5) 让用户在游戏里实测，然后读日志
+# 4) 让用户在游戏里实测，然后读日志
 Select-String -Path "$env:USERPROFILE\AppData\LocalLow\Freehold Games\CavesOfQud\Player.log" `
               -Pattern '\[Toncihana\]|MODERROR.*Storm-Caller'
 
-# 6) 提交
-cd $repo; git add -A; git commit -m "..."
+# 5) 提交并推送到 GitHub（一条命令）
+pwsh -File publish.ps1 "说明这次改了什么"
 ```
 
 ### 交付前自检
@@ -250,6 +250,29 @@ XML 属性名 = 部件类上的 C# 公共字段/属性名（吻合率 **100%**�
 6. **加了 `Load="Merge"` 就不要同时写 `Inherits`**。
 7. **脚本模组有安全批准机制** —— 用户不批准，该模组**连 XML 都不会加载**。
 
+### 本机工具链的坑
+
+8. **含中文的 `.ps1` 被 `edit`/`write` 改过之后，BOM 会丢，脚本必崩。**
+   `powershell`（Windows PowerShell 5.1）在没有 BOM 时**按 ANSI 读 `.ps1`**，
+   满文件中文被逐字节拆散，报错会指向一段**完全合法**的代码
+   （例如 `Unexpected token '}'`），排查方向被彻底带偏。
+
+   **判据**：
+   ```powershell
+   ([System.IO.File]::ReadAllBytes('...\x.ps1')[0..2]) -join ','   # 应为 239,187,191
+   ```
+   **修复**（改完 `.ps1` 立刻做，然后跑一次验证）：
+   ```powershell
+   $f = '...\x.ps1'
+   $raw = [System.IO.File]::ReadAllText($f, [System.Text.UTF8Encoding]::new($false))
+   [System.IO.File]::WriteAllText($f, $raw, [System.Text.UTF8Encoding]::new($true))
+   ```
+   本仓库里 `sync.ps1`、`publish.ps1`、`_tools\preflight.ps1` 都是含中文的 `.ps1`，
+   全都适用这一条。
+
+9. **PowerShell 变量名大小写不敏感** —— 局部变量 `$status` 与参数 `[switch]$Status`
+   是**同一个变量**，给它赋字符串会抛 `Cannot convert ... SwitchParameter`。命名时避开。
+
 更完整的坑与做法见 `Caves of Qud 模组制作入门指南.md`。
 
 ---
@@ -303,30 +326,48 @@ Remove-Item $src -Recurse -Force -ErrorAction SilentlyContinue
 
 ## 八、做实际模组时的起点
 
-### 正在做的模组：Toncihana / 2Raine_Ancient_Pioneer
+### 仓库布局：仓库根 = 工作区根
 
-**仓库**（真源）：`D:\caves of qud 模组制作\2Raine_Ancient_Pioneer\`
+`D:\caves of qud 模组制作\` **本身就是一个 git 仓库**（远程 `2Raine/2Raine_Ancient_Pioneer`）。
+一份历史覆盖模组本体、设计笔记、工具与错误日志 —— 不会出现"笔记改了没提交"
+或"工具在另一个目录所以没进库"这类漏洞。
 
 ```
 mod/Toncihana_Elemental/     模组本体 —— 改代码改这里
-docs/                        设计笔记与调研资料
-tools/                       本文件的 qud.py 等工具的副本
+_tools/                      查询、校验、预检工具（含 preflight.ps1、Reflect/）
+preset/                      插件预设副本（真身在 ~/.dsh/.agent-presets/modder/）
+docs/                        调研资料 + images/
 sync.ps1                     工作区 <-> 游戏模组目录 双向同步
+publish.ps1                  提交 + 推送到 GitHub
+根                           设计笔记、错误日志.md、AGENTS.md、README.md
+qud_db/  qud_src/            重建产物，已 .gitignore（重建法见 README）
 ```
 
-游戏从自己的目录加载模组，所以**改完必须 `sync.ps1 push`**，否则游戏跑的还是旧代码。
-`sync.ps1 diff` 只报差异、不动文件；`push` 以仓库为准；`pull` 以游戏目录为准。
+**游戏从它自己的目录加载模组**，所以改完必须同步：
+
+```powershell
+cd "D:\caves of qud 模组制作"
+pwsh -File sync.ps1 diff       # 只看差异，不动文件
+pwsh -File sync.ps1 push       # 工作区 -> 游戏（改完走这个，否则游戏跑旧代码）
+pwsh -File sync.ps1 pull       # 游戏 -> 工作区（在游戏目录临时试改过之后用）
+pwsh -File publish.ps1 "说明"   # 提交 + 推送到 GitHub
+```
+
 脚本**绝不复制 `.dll` / `.pdb`** —— 那是游戏编译产物，在 `ModAssemblies\` 下。
 
-**关键设计文档**：`docs/Toncihana_制作笔记与调参参考.md`（2200+ 行）
+**远端访问**：本机 `github.com:22` 被拒，`~/.ssh/config` 已把 github.com 指向
+`ssh.github.com:443`，所以 `git@github.com:...` 可直接用。验证 `ssh -T git@github.com`
+应回 `Hi 2Raine!`。GitHub 不会因 push 自动建库，首次必须先在网页建空库。
+
+**关键设计文档**：`Toncihana_制作笔记与调参参考.md`（仓库根，2200+ 行）
 —— 数值调参、踩坑记录、每条结论的出处。**改数值前先查这份。**
 
 **常用定位**：
 
 | 想找 | 看 |
 | --- | --- |
-| 种族 / 子类型 | `Genotypes.xml`、`Subtypes.xml` |
-| 解剖与身体部位 | `Bodies.xml`（注意 `Category` 必须是 `BodyPartCategory` 里的合法值） |
+| 种族 / 子类型 | `mod/Toncihana_Elemental/Genotypes.xml`、`Subtypes.xml` |
+| 解剖与身体部位 | `Bodies.xml`（注意 `Category` 必须是 `BodyPartCategory` 的合法值） |
 | 生物蓝图 | `ObjectBlueprints\Creatures.xml`、`2Raine_Toncihana_Bodies.xml` |
 | 物品 / 书 / 技能 | `ObjectBlueprints\Items.xml`、`2Raine_Toncihana_Books.xml`、`2Raine_Toncihana_Skills.xml` |
 | 刷新与派系 | `PopulationTables.xml`、`Factions.xml` |

@@ -23,7 +23,8 @@ param(
 $ErrorActionPreference = 'Continue'
 
 $WS   = 'D:\caves of qud 模组制作'
-$REPO = Join-Path $WS '2Raine_Ancient_Pioneer'
+# 仓库根 = 工作区根（2026-10-04 起），不再有子目录
+$REPO = $WS
 $MOD  = Join-Path $REPO 'mod\Toncihana_Elemental'
 $GAME = Join-Path $env:USERPROFILE 'AppData\LocalLow\Freehold Games\CavesOfQud'
 $PY   = 'C:\Users\16064\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe'

@@ -10,8 +10,12 @@ Caves of Qud 模组制作仓库。以父种族「远古开拓者 / Ancient Pione
 
 ## 目录结构
 
+**仓库根 = 工作区根**（`D:\caves of qud 模组制作\`）。一份历史覆盖模组本体、
+设计笔记、工具与错误日志 —— 不会出现"笔记改了没提交"或"工具在另一个目录
+所以没进库"这类漏洞。
+
 ```
-mod/Toncihana_Elemental/     模组本体（游戏实际加载的那份的镜像）
+mod/Toncihana_Elemental/     模组本体 —— 改代码改这里
   manifest.json              模组清单
   Genotypes.xml              种族：2Raine_AncientPioneer_Elemental
   Subtypes.xml               子类型：2Raine_Toncihana_Elemental
@@ -23,28 +27,35 @@ mod/Toncihana_Elemental/     模组本体（游戏实际加载的那份的镜像
   Scripts/                   C# 源码
   Textures/                  贴图
 
-docs/                        设计笔记与调研资料
-  Toncihana_制作笔记与调参参考.md   ★ 主要设计文档
-  AGENTS.md                       机制数据库使用摘要
-  Qud机制数据库_使用说明.md        数据库完整手册
-  Caves of Qud 模组制作入门指南.md  Wiki 整理（含错误标注）
-  caves-of-qud-xml-data-modding-notes.md
-  world-zones-content-release-research.md
-  qud-basegame-reference-report.md
-  qud_csharp_harmony_research_note.md
-  images/                          渲染预览图
-
-tools/                       离线机制数据库工具（25 个脚本）
+_tools/                      查询、校验、预检工具（30 个）
   qud.py                     ★ 主查询工具
+  preflight.ps1              ★ 开工前 / 交付前自检
   validate_mod.py                XML/引用校验
-  audit_references.py            全引用审计（对引擎解析路径逐项核对）
+  audit_references.py            全引用审计（按引擎解析路径逐项核对）
   check_csharp.ps1               独立编译校验（不启动游戏）
   blueprint_chain.py             蓝图继承链解析
   index_*.py / extract_blocks.py 数据库重建（幂等）
   rpm_analyze.py                 .rpm 地图解析
+  Reflect/                       C# 反射工具
 
-sync.ps1                     工作区 <-> 游戏模组目录 双向同步
+preset/                       DSH 插件预设副本（真身 ~/.dsh/.agent-presets/modder/）
+docs/                         调研资料 + images/（渲染预览图）
+
+根                            AGENTS.md、README.md、错误日志.md、
+                              Toncihana_制作笔记与调参参考.md 等设计文档
+                              sync.ps1、publish.ps1
+
+qud_db/  qud_src/             重建产物，已 .gitignore（重建法见下文）
 ```
+
+### 脚本一览
+
+| 脚本 | 作用 |
+| --- | --- |
+| `sync.ps1 diff\|push\|pull` | 工作区 <-> 游戏模组目录 双向同步 |
+| `publish.ps1 "说明"` | 提交 + 推送到 GitHub |
+| `_tools\preflight.ps1 before\|after\|mistake\|log` | 开工前清单 / 交付前校验 / 记错误 / 看错误 |
+
 
 ---
 
@@ -111,10 +122,13 @@ pwsh -File publish.ps1 "说明这次改了什么"
 2. 配置远程并推送：
 
 ```powershell
-cd "D:\caves of qud 模组制作\2Raine_Ancient_Pioneer"
+cd "D:\caves of qud 模组制作"
 git remote add origin git@github.com:2Raine/2Raine_Ancient_Pioneer.git
 git push -u origin main
 ```
+
+> **已完成。** 远程是 `git@github.com:2Raine/2Raine_Ancient_Pioneer.git`，
+> 默认分支 `main`，`publish.ps1` 可直接用。
 
 ### SSH 走 443 端口
 
