@@ -13,10 +13,27 @@
 | --- | --- | --- | --- |
 | **1. 本文件** | `AGENTS.md` | **每次对话的第一次请求**自动注入，之后常驻历史直到上下文压缩 | 参考材料语气，可被忽略 |
 | **2. 预检脚本** | `_tools\preflight.ps1` | 我主动跑；`after` 会实际执行全部校验并 `exit 1` | 把跳过变成显式动作 |
-| **3. 插件门禁** | `~\.dsh\.agent-presets\modder\qa-mod-workflow.mjs` | 会话选用 `Modder (Qud)` 预设时**由引擎强制** | **硬拦截**，不是建议 |
+| **3. 插件门禁** | 宿主层或预设层，见下 | 由引擎强制（`ctx.tools.guard()`） | **硬拦截**，不是建议 |
 
-**第 1 层已经生效，不需要你做任何事。** 第 3 层要你在**新会话里、发第一条消息之前**选用
-`Modder (Qud)` 预设 —— 预设一旦开过一轮就锁定了（`agent-preset/locked`），中途换不了。
+### 第 3 层挂在哪：两种模式，**宿主层才是可靠的**
+
+插件本体只有一份（仓库副本 `preset/qa-mod-workflow.mjs`），但有两个挂载点：
+
+| 模式 | 挂载点 | 生效条件 | 可靠性 |
+| --- | --- | --- | --- |
+| **宿主层** | `~\.dsh\profiles\desktop\cordis.patch.yml` 的 `qa-mod-workflow` 一行 | 所有会话，**不用选任何预设** | 已在本机 desktop build 配置并校验 |
+| 预设层 | `~\.dsh\.agent-presets\modder\agent.cordis.yml` | 会话选用 `Modder (Qud)` 预设 | **本机 desktop build 无效** |
+
+**为什么预设层在这台机器上无效**（2026-10-04 查证）：本机跑的是打包进 `app.asar` 的
+desktop build，它的预设注册表 `@deepseek-ai/dsh-agent-preset-registry` 的 `Config`
+只有 `default` 与 `selectedDefault` 两个字段，**不扫描 `~/.dsh/.agent-presets`**；
+预设是靠预设组合文件里的 `@deepseek-ai/dsh-agent-preset` 行逐条注册的。
+所以 `~/.dsh/.agent-presets/` 下放什么都不会出现在那个选择框里 —— 试过，两个自定义预设
+一个都不显示。
+**判据**：`app.asar` 内全文搜 `.agent-presets` → **0 命中**。
+
+宿主层挂上之后，受保护区域的拦截、`workflow_*` 三个工具、回合结束的未提交提醒照常工作；
+插件的 `workspace` 配置是作用域，工作目录不在本工作区的会话完全静默。
 
 ### 第 3 层到底拦什么
 
@@ -377,7 +394,7 @@ Remove-Item $src -Recurse -Force -ErrorAction SilentlyContinue
 ```
 mod/Toncihana_Elemental/     模组本体 —— 改代码改这里
 _tools/                      查询、校验、预检工具（含 preflight.ps1、Reflect/）
-preset/                      插件预设副本（真身在 ~/.dsh/.agent-presets/modder/）
+preset/                      门禁插件与预设的仓库副本（两个真身都在 ~/.dsh 下，见第〇〇节）
 docs/                        调研资料 + images/
 sync.ps1                     工作区 <-> 游戏模组目录 双向同步
 publish.ps1                  提交 + 推送到 GitHub
