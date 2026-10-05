@@ -29,7 +29,7 @@
     <skills>
       <skill Name="Tactics_Run" />
       <skill Name="Survival_Camp" />
-      <skill Name="CookingAndGathering_MealPreparation" />
+      <skill Name="CookingAndGathering" />
     </skills>
 
     <reputations>
