@@ -255,6 +255,7 @@ namespace Toncihana
                     links.EnsureAbilities(Player);
                 }
                 Player.RequirePart<A2Raine_Toncihana_InwardEye>();
+                Player.RequirePart<A2Raine_Toncihana_Devour>();
             }
         }
 
