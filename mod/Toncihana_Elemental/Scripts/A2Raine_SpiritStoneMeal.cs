@@ -22,7 +22,7 @@ namespace XRL.World.Parts
 
         public int Amount = 1;
 
-        public string Message = "{{B|Something in you takes the strike and keeps it.}}";
+        public string Message = "{{B|Something in you takes the strike and keeps it, and does not give it back.}}";
 
         public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
@@ -45,8 +45,6 @@ namespace XRL.World.Parts
                     if (eater.IsPlayer())
                     {
                         IComponent<GameObject>.AddPlayerMessage(Message);
-                        IComponent<GameObject>.AddPlayerMessage("{{B|Spirit charge: "
-                            + eater.GetIntProperty(CHARGE_PROPERTY) + ".}}");
                     }
                 }
             }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  	<object Name="2Raine_Toncihana_Link_Hands" Inherits="BaseCyberneticsEquipment_2point">
+    	<part Name="Physics" Weight="0" />
+    	<part Name="Render" DisplayName="{{W|link of the steady aim}}" Tile="Items/sw_flexors.bmp"
+    	      TileColor="&amp;c" DetailColor="C" />
+    	<part Name="Description" Short="Something in the wrist remembers a hand it never had, and steadies it." />
+    	<part Name="CyberneticsBaseItem" Slots="Hands" Cost="0" BehaviorDescription="+1 Agility, +1 Ego" />
+    	<part Name="CyberneticsStatModifier" Stats="Agility:1;Ego:1" />
+  	</object>
+
+  	<object Name="2Raine_Toncihana_Link_Feet" Inherits="BaseCyberneticsEquipment_2point">
+    	<part Name="Physics" Weight="0" />
+    	<part Name="Render" DisplayName="{{W|link of the long stride}}" Tile="Items/sw_ultratendons.bmp"
+    	      TileColor="&amp;c" DetailColor="C" />
+    	<part Name="Description" Short="The ground learns to arrive sooner. Nothing is spent on it; it simply comes closer." />
+    	<part Name="CyberneticsBaseItem" Slots="Feet" Cost="0" BehaviorDescription="+5 movespeed, +1 Ego" />
+    	<part Name="CyberneticsStatModifier" Stats="MoveSpeed:-5;Ego:1" />
+  	</object>
+
+  	<object Name="2Raine_Toncihana_Link_Arm" Inherits="BaseCyberneticsEquipment_2point">
+    	<part Name="Physics" Weight="0" />
+    	<part Name="Render" DisplayName="{{W|link of the sure grip}}" Tile="Items/sw_armlocks.bmp"
+    	      TileColor="&amp;c" DetailColor="C" />
+    	<part Name="Description" Short="A grip closes on a strength that was always there and never used." />
+    	<part Name="CyberneticsBaseItem" Slots="Arm" Cost="0" BehaviorDescription="+1 Strength, +1 Ego" />
+    	<part Name="CyberneticsStatModifier" Stats="Strength:1;Ego:1" />
+  	</object>
+
+</objects>
