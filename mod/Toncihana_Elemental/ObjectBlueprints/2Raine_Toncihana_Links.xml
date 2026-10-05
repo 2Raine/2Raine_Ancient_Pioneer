@@ -8,6 +8,7 @@
     	<part Name="Description" Short="Something in the wrist remembers a hand it never had, and steadies it." />
     	<part Name="CyberneticsBaseItem" Slots="Hands" Cost="0" BehaviorDescription="+1 to hit, +1 Ego" />
     	<part Name="CyberneticsStatModifier" Stats="Ego:1" />
+    	<part Name="A2Raine_Toncihana_Link" />
     	<part Name="CyberneticsPropertyModifier" Props="MeleeHitBonus:1" />
     	<part Name="RulesDescription" Text="+1 to hit, +1 Ego" />
   	</object>
@@ -19,6 +20,7 @@
     	<part Name="Description" Short="The ground learns to arrive sooner. Nothing is spent on it; it simply comes closer." />
     	<part Name="CyberneticsBaseItem" Slots="Feet" Cost="0" BehaviorDescription="+5 movespeed, +1 Ego" />
     	<part Name="CyberneticsStatModifier" Stats="MoveSpeed:-5;Ego:1" />
+    	<part Name="A2Raine_Toncihana_Link" />
     	<part Name="RulesDescription" Text="+5 movespeed, +1 Ego" />
   	</object>
 
@@ -29,6 +31,7 @@
     	<part Name="Description" Short="A grip closes on a strength that was always there and never used." />
     	<part Name="CyberneticsBaseItem" Slots="Arm" Cost="0" BehaviorDescription="+1 Strength, +1 Ego" />
     	<part Name="CyberneticsStatModifier" Stats="Strength:1;Ego:1" />
+    	<part Name="A2Raine_Toncihana_Link" />
     	<part Name="RulesDescription" Text="+1 Strength, +1 Ego" />
   	</object>
 
