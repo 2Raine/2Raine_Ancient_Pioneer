@@ -33,6 +33,18 @@ namespace XRL.World.Parts
         /// <summary>Percent of the shooter's MAXIMUM charge spent per shot.</summary>
         public int ChargePercent = 10;
 
+        /// <summary>
+        /// Floor on the charge spent per shot. 0 = none, i.e. purely the percentage.
+        ///
+        /// This used to be hardcoded to 1000, which badly distorted the early game: a level-1
+        /// character's maximum is 4000, so 10% is 400 -- but the floor made every shot cost 1000,
+        /// i.e. 25% of the bar, and with 200 charge regenerating per action that is five actions
+        /// per shot instead of two. It was there to keep the old (vanilla) damage formula from
+        /// returning null below 1000 charge, but damage no longer uses that formula, so the floor
+        /// had outlived its reason. Left as a knob in case a floor is wanted later.
+        /// </summary>
+        public int MinChargePerShot = 0;
+
         /// <summary>Arc chain length. Fixed: see the class comment.</summary>
         public int BaseVoltage = 3;
 
@@ -64,9 +76,9 @@ namespace XRL.World.Parts
             {
                 // A percentage of max, with a floor so a low-level character can still fire at all.
                 spent = ARaine_Charge.GetMaxCharge(E.Actor) * ChargePercent / 100;
-                if (spent < 1000)
+                if (spent < MinChargePerShot)
                 {
-                    spent = 1000;
+                    spent = MinChargePerShot;
                 }
                 if (!ARaine_Charge.TryUseCharge(E.Actor, spent))
                 {
