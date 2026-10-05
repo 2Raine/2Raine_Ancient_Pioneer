@@ -97,14 +97,16 @@ namespace XRL.World.Parts
             List<int> shown = new List<int>();
             List<string> options = new List<string>();
 
+            // Every un-implanted link costs the same: the price is for the NEXT unlock, not for a
+            // particular link.
+            int cost = A2Raine_Toncihana_StormLinks.NextUnlockCost(who);
+
             for (int i = 0; i < links.Length && i < keys.Length && i < AbilityLabel.Length; i++)
             {
                 if (A2Raine_Toncihana_StormLinks.HasLink(who, links[i]))
                 {
                     continue;
                 }
-
-                int cost = A2Raine_Toncihana_StormLinks.CostOf(i);
                 string label = AbilityLabel[i] + " - " + AbilityBlurb[i];
                 if (charge >= cost)
                 {
@@ -138,7 +140,7 @@ namespace XRL.World.Parts
             }
 
             int index = shown[choice];
-            int need = A2Raine_Toncihana_StormLinks.CostOf(index);
+            int need = A2Raine_Toncihana_StormLinks.NextUnlockCost(who);
             if (charge < need)
             {
                 Popup.ShowFail("The storm in you has not gathered that deeply. This link asks "

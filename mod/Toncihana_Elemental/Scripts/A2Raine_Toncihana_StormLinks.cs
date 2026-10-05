@@ -60,25 +60,29 @@ namespace XRL.World.Parts
             "ThunderFire",
         };
 
-        public static int CostOf(int Index)
+        /// <summary>
+        /// How many links are implanted. Cost is keyed on THIS, not on which link it is: the first
+        /// unlock costs the same whichever one you pick, and each one after costs a step more.
+        /// (It used to key on the link's position in LinkOrder, which made the price a property of
+        /// the link rather than of how far along you were.)
+        /// </summary>
+        public static int CountUnlocked(GameObject Who)
         {
-            return Index < 0 ? 0 : FirstUnlockCost + Index * UnlockCostStep;
-        }
-
-        public static int CostOfLink(string Blueprint)
-        {
-            if (Blueprint == null)
-            {
-                return 0;
-            }
+            int count = 0;
             for (int i = 0; i < LinkOrder.Length; i++)
             {
-                if (LinkOrder[i] == Blueprint)
+                if (HasLink(Who, LinkOrder[i]))
                 {
-                    return CostOf(i);
+                    count++;
                 }
             }
-            return 0;
+            return count;
+        }
+
+        /// <summary>Cost of the NEXT link, whichever one it turns out to be.</summary>
+        public static int NextUnlockCost(GameObject Who)
+        {
+            return FirstUnlockCost + CountUnlocked(Who) * UnlockCostStep;
         }
 
         public static int Charge(GameObject Who)
