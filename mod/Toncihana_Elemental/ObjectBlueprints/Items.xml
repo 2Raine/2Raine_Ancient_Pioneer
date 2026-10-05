@@ -70,6 +70,8 @@
     <part Name="Food" Satiation="Snack" Thirst="0" Healing="0"
           Message="It dissolves on your tongue and is simply gone." />
 
+    <part Name="A2Raine_SpiritStoneMeal" Amount="1" />
+
     <part Name="PreservableItem" Result="2Raine_SpiritStonePowder" Number="3" />
 
     <tag Name="Tier" Value="4" />

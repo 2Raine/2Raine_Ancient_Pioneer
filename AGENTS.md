@@ -331,6 +331,16 @@ DSH 那边的工具**恰好也叫 `pwsh`**，但那是宿主自带的工具名�
     判据：`GameObjectBlueprint.cs:43` + `ObjectBlueprintLoader.cs:127`；
     原版 5221 个带 `<part>` 的蓝图里 **4573 个**都依赖这个语义。详见笔记 〇之二十七。
 
+12. **Harmony 不是"一碰就炸整个模组"。** 第五轮曾把"四个技能 + 发电突变全没了"归因给它，
+    **第六轮已经推翻这个归因** —— 真凶是 `Name` 必须等于 `Class`（`AddMutation` 静默返回 -1）。
+    源码依据：`ModInfo.cs:819-820`（`ApplyHarmonyPatches(); return compilationResult.Success;`
+    —— 返回值只看编译）、`:845-862`（`PatchAll` 的异常被 try/catch 吞掉，只记一行 `Failure :(`）。
+    **真实风险只有两个**：①`PatchAll` **全有或全无** —— 一个补丁失败，**同一 assembly 里
+    后面的补丁全不打**（但**不影响类注册**）；②游戏更新或别的 mod 改同一方法会让它失效。
+    **用的话**：不要写 `[HarmonyPatch]` 特性（会被加载器扫进 `PatchAll`），改成
+    `new Harmony(id).Patch(...)` **逐个打 + 各自 try/catch**，优先 **Postfix**，签名先去 `qud_src` 核准。
+    **但优先级不变：能用事件/部件做的，优先事件/部件。** 详见笔记 〇之三 的补记。
+
 更完整的坑与做法见 `Caves of Qud 模组制作入门指南.md`。
 
 ---

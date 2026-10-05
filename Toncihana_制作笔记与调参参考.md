@@ -260,6 +260,55 @@ Player.log:
 | 四个技能 | 依赖 DLL 正常加载，本轮应恢复 |
 | 自然回复 | 纯代码实现，`DisabledNaturalHealing` + `EndTurnEvent` |
 
+### 补记（复核）：上面这个归因是错的
+
+第五轮把"四个技能 + 发电突变全没了"归因给 Harmony，**第六轮已经自己推翻了它** ——
+原文在 〇之四："同一条代码路径，再生成功、我的失败 —— 所以问题不在身体部位、不在 embark 模块、
+**不在 DLL**，而在突变条目本身"。
+
+对照源码，那条"补丁失败 → 整个 DLL 的类注册失败"的链条**不成立**：
+
+```csharp
+// qud_src/XRL/ModInfo.cs:819-820
+ApplyHarmonyPatches();
+return compilationResult.Success;      // ← 返回值只看编译，与 Harmony 无关
+
+// qud_src/XRL/ModInfo.cs:845-862 —— PatchAll 的异常被 try/catch 吞掉，只记一行日志
+try { ... Harmony.PatchAll(Assembly); Logger.buildLog.Info("Success :)"); }
+catch (Exception ex) { Error(...); Logger.buildLog.Info("Failure :("); }
+```
+
+**真凶**（〇之四实测）：`AddMutation('Overcharged Electrical Generation', 1)` 返回 **-1**、
+`AddMutation('Regeneration', 1)` 返回 **0** —— 根因是 `Name` 必须等于 `Class`。
+当时"删 Harmony"和"改对 Name"挨在一起，于是错怪了 Harmony。
+
+**Harmony 的真实风险**：
+
+| 风险 | 说明 |
+| --- | --- |
+| **`PatchAll` 全有或全无** | 加载器 `ModInfo.ApplyHarmonyPatches` 对每个模组的 assembly 调一次 `PatchAll`；**一个补丁失败，后面的全不打**（但**不影响类注册**） |
+| 版本漂移 | 游戏更新后目标方法改名/改签名 → 补丁失效 |
+| mod 互踩 | 两个 mod 改同一个方法 |
+| 补丁类型 | 官方分级：**Postfix 最兼容 > 非阻塞 Prefix > 阻塞式 Prefix / Transpiler**（最危险） |
+| 失败不可见 | `harmony.log.txt` 不记这种失败，只有 `build_log.txt` 一行 `Failure :(` |
+
+**安全用法**（避开自动 `PatchAll` 的全有或全无）：
+
+```csharp
+// 关键：不要用 [HarmonyPatch] 特性 —— 加载器的 PatchAll 会扫到它，一个失败就全不打。
+// 改成自己逐个打，各自 try/catch：一个失败只丢它自己。
+var harmony = new Harmony("2Raine.Toncihana");
+try {
+    MethodInfo original = AccessTools.Method(typeof(TargetType), "MethodName");
+    if (original == null) { /* 目标没了 → 跳过，只丢功能 */ }
+    else harmony.Patch(original, postfix: new HarmonyMethod(typeof(...).GetMethod("Postfix")));
+} catch (Exception ex) { UnityEngine.Debug.LogWarning("[Toncihana] harmony patch skipped: " + ex); }
+```
+
+**结论修正**：Harmony **不是**"一碰就炸整个模组"。它是"最后手段"的真正原因是
+①游戏更新会让补丁失效 ②和其他改同一方法的 mod 可能互踩。
+所以规则是：**能用事件/部件做的，仍然优先事件/部件；确实做不到时才用 Harmony，并遵守上面的安全用法。**
+
 ---
 
 ## 〇之四、第六轮：诊断日志抓到真凶（`Name` 必须等于 `Class`）
@@ -2270,3 +2319,91 @@ mod 制作是说一不二的：是就是，不是就不是。
   `Mutations`，我们只给了 `<tag Name="Species" Value="elemental" />`。**未实测。**
   备选是重建显式命名（曾写过 `QudishName`，抄原版 `Naming.xml` 的 Qudish 音素表，11:04 删掉了）。
 - 5% 概率下传奇的实际观感（等级、掉落、能不能对话）。
+
+---
+
+## 〇之二十八：精灵石作为力量来源 —— 吃、计数，以及两个同名的陷阱
+
+### 一、设计（2026-10-04 定）
+
+- **精灵石 = 力量来源**：直接吃 → 累积一个计数器
+- 计数达量 → 选部位**植入**（**不叫义体**；自定义植入体**不进义体刷新池**）→ 以此解锁技能
+- 计数器是**一个通用值**；元素的差异只体现在物品本身，不做分支
+
+### 二、让物品"能吃"需要什么（照抄 `Jerky` / `Raw Pig Meat`）
+
+```xml
+<part Name="Food" Satiation="None" Message="..." />
+```
+
+- **`Food` 就是让物品可食用的部件**（原版 110 处）。`Food.cs:11-23` 的默认值：
+  `Satiation="None"`、`Healing="0"`、`Thirst=0`、`Message="That hits the spot!"`
+- `Healing="0"` 会让 `Eat` 动作的**优先级**变成 0（`Food.cs` 的 `GetInventoryActionsEvent`），
+  但**不影响能不能吃** —— `Jerky` 用的就是默认 `"0"`，它照样能吃
+- 真正的前置是**吃的人要有 `Stomach` 部件**（`Creature` 基类自带）
+
+### 三、★★ 两个同名的陷阱
+
+| 名字 | 它是什么 | 用途 |
+| --- | --- | --- |
+| **`Food`** | **既是部件、又是蓝图**（`Raw Meat` 继承的那个） | 部件 = 可食用；蓝图 = 生肉类基类 |
+| **`PreservableItem`** | **部件**（65 处），属性 `Number` + `Result` | 加在**生食材**上；`Result` 是产出物的蓝图名 |
+| **`Preservable`** | **蓝图**（`Foods.xml:42`），带的是 `Preservable` **标签** | **preserve 之后的产物**的基类（`Jerky` 就继承它） |
+
+**`PreservableItem`（能被 preserve 的）和 `Preservable`（preserve 的产物）名字几乎一样、作用相反。**
+本模组当时把"产物"写对了、本体那条漏了，后来才补上。
+
+**篝火 `PreserveExotic` 的真实过滤条件**（`Campfire.cs:659`）：
+
+```csharp
+go.HasPart<PreservableItem>() && go.HasTag("ChooseToPreserve") && !go.IsTemporary && go.Understood()
+```
+
+`ChooseToPreserve` 在原版数据里**没有任何地方写它**（只在 `Campfire.cs` 读到 4 处）——
+又一个"引擎支持、数据没用"的标签。**未验证**：它是否会由烹饪界面在运行时添加。
+
+### 四、吃了加计数：挂 `OnEat`，不用 Harmony
+
+`Food.cs` 的 `HandleEvent(InventoryActionEvent)` 在 `E.Command == "Eat"` 时：
+
+```csharp
+Event obj = Event.New("OnEat");
+obj.SetParameter("Actor", E.Actor); ("Eater", E.Actor); ("Subject", E.Actor);
+obj.SetParameter("Food", ParentObject); ("Object", ParentObject);
+ParentObject.FireEvent(obj, E);     // ← 被吃的【物品】收到 "OnEat"
+obj.ID = "Eating";
+E.Actor.FireEvent(obj);             // ← 【吃的人】收到 "Eating"
+```
+
+所以**最干净的落点**是：精灵石自己挂一个部件处理 `"OnEat"`，给吃的人加计数。
+既不需要"监听所有人吃的所有东西"，也不需要 Harmony。
+
+实现：`Scripts/A2Raine_SpiritStoneMeal.cs`（`Registrar.Register("OnEat")` + `FireEvent`）。
+
+### 五、计数器 = `GameObject` 的 IntProperty
+
+```csharp
+eater.ModIntProperty("2Raine_SpiritCharge", Amount);
+```
+
+这个形状直接抄自 Becoming 的 `Insight.cs`（Psychic Predation 树的货币）与 `AetherEssence.cs`。
+它注释里那条判断值得记：*"pure GameObject.IntProperty counter, **not a Statistic** —
+we're the only reader/writer, no real game system needs to see this as an actual stat."*
+
+**为什么不用 `SetIntGameState`**：那是**存档级**的；这个数值要跟**角色**走（换角色不能串）。
+
+### 六、显示（先用消息框）
+
+Becoming 用过三层，成本递增：
+
+1. **消息框** —— `IComponent<GameObject>.AddPlayerMessage(...)`（`Insight.cs:63`）← 本模组先用这个
+2. **技能条目上的条件行** —— 原版 `PowerEntryRequirement.Render()`（`PowerEntryRequirement.cs:38-57`）
+   本来就会把"属性 ≥ N"渲染成绿/红，可以复用来自定义条件的显示
+3. **自定义 HUD** —— `ForceAegisHPBar.cs` / `Unbound.cs`
+
+### 七、下一步（都还没做）
+
+- 计数达量 → 弹框选部位 → **植入自定义植入体**
+  （`GameObjectCyberneticsUnit.Implant`，已核实**无种族/许可拦截**；`implant 蓝图名:槽位` 可直接测试）
+- 技能解锁：`MeetsRequirements` override 读这个 IntProperty
+- 那条"引擎支持但原版没用过"的现成属性也别忘：`<power Requires="技能名或突变名">`
