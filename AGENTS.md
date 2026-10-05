@@ -143,6 +143,10 @@ powershell -File publish.ps1 "说明这次改了什么"
   一条长期存在的假告警，成本是每次看日志都要重新判一次。
   实例：`LOAD PROBLEM` 曾对非 Toncihana 存档报"数据全丢"，因为那段诊断没先问 `IsToncihana`。
   **诊断要么有信息量，要么不该出现。**
+- **指认"某个实体是什么"时要回定义处。** 说"X 的躯体 / 攻击 / 派系 / 属性是 Y"之前，
+  把定义那行 grep 出来（`Inherits=` / `Anatomy=` / `BodyObject=`）—— **引用比回忆可靠**。
+  实例：曾把 Elemental 生物的 `2Raine_Elemental_HeadBlow` 说成 Toncihana 的攻击方式，
+  而三条躯体就挤在同一个文件里（`2Raine_Toncihana_Bodies.xml`）。**读到 ≠ 记住。**
 
 ---
 
