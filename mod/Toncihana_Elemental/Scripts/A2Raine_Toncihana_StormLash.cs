@@ -51,6 +51,16 @@ namespace XRL.World.Parts
         {
             bool ours = E.Object == ParentObject && E.Actor != null && ChargePerShot > 0;
 
+            // One line that separates every branch: no line at all means this part is not on the
+            // weapon (stale object from an older save, or the blueprint part list is wrong);
+            // ours=false names which of the three conditions failed.
+            UnityEngine.Debug.Log("[Toncihana] storm lash load: ours=" + ours
+                + " objectMatch=" + (E.Object == ParentObject)
+                + " actor=" + ((E.Actor == null) ? "null" : E.Actor.Blueprint)
+                + " chargePerShot=" + ChargePerShot
+                + " charged=" + ARaine_Charge.GetCharge(E.Actor)
+                + "/" + ARaine_Charge.GetMaxCharge(E.Actor));
+
             if (ours && !ARaine_Charge.TryUseCharge(E.Actor, ChargePerShot))
             {
                 E.Message = NotEnoughMessage;
