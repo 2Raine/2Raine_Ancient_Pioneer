@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  <object Name="2Raine_Toncihana_StormLash" Inherits="NaturalMissileWeapon">
+    <part Name="Render" DisplayName="standing storm" ColorString="&amp;W" DetailColor="c" />
+    <part Name="Description" Short="The air at the end of the arm keeps a small weather of its own, and it is always about to break." />
+
+    <part Name="MissileWeapon" RangeIncrement="10" Skill="Rifle" AmmoChar="&amp;W*"
+          ShotsPerAction="1" AmmoPerAction="1" ShotsPerAnimation="1" WeaponAccuracy="2" />
+
+    <part Name="EnergyAmmoLoader" ChargeUse="0" ProjectileObject="2Raine_LightningBolt" />
+
+    <part Name="A2Raine_Toncihana_StormLash" ChargePerShot="200" />
+
+    <tag Name="UsesSlots" Value="Missile Weapon" />
+  </object>
+
+</objects>

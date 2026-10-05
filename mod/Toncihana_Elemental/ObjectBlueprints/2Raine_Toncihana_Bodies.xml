@@ -39,6 +39,9 @@
 
     <part Name="A2Raine_Toncihana_Physiology" />
 
+    <part Name="A2Raine_BornEquipped" Blueprint="2Raine_Toncihana_StormLash"
+          Slot="Missile Weapon" SlotIndex="0" />
+
     <part Name="DisabledNaturalHealing" />
 
     <intproperty Name="Bleeds" Value="0" />
