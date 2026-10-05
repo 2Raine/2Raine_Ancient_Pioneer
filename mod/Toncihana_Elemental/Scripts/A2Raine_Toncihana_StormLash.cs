@@ -36,9 +36,22 @@ namespace XRL.World.Parts
         /// <summary>Arc chain length. Fixed: see the class comment.</summary>
         public int BaseVoltage = 3;
 
-        /// <summary>Damage dice at level 0, and how many levels add one more d4.</summary>
+        /// <summary>Damage dice at level 0.</summary>
         public int BaseDice = 2;
-        public int LevelsPerDie = 5;
+
+        /// <summary>
+        /// LINEAR term: levels per extra die. Deliberately 0 by default -- a straight line is the
+        /// wrong shape for this game. Levels arrive fastest through the low teens and slow down
+        /// around 20, which is still mid-game, so a linear curve peaks far too early.
+        /// </summary>
+        public int LevelsPerDie = 0;
+
+        /// <summary>
+        /// SQUARED term: extra dice = level*level / this. Small early, accelerating later, which is
+        /// the inverse of how the level curve behaves. At 150: L1 2d4, L10 2d4, L20 4d4, L30 8d4,
+        /// L40 12d4. Raise the divisor to flatten it, lower it to steepen.
+        /// </summary>
+        public int SquaredDiceDivisor = 150;
 
         public string NotEnoughMessage = "{{W|The storm in you is too thin to answer.}}";
 
@@ -75,7 +88,16 @@ namespace XRL.World.Parts
                 if (discharge != null)
                 {
                     int level = E.Actor.Stat("Level");
-                    discharge.DamageRange = (BaseDice + level / LevelsPerDie) + "d4";
+                    int dice = BaseDice;
+                    if (LevelsPerDie > 0)
+                    {
+                        dice += level / LevelsPerDie;
+                    }
+                    if (SquaredDiceDivisor > 0)
+                    {
+                        dice += level * level / SquaredDiceDivisor;
+                    }
+                    discharge.DamageRange = dice + "d4";
                     discharge.Voltage = BaseVoltage.ToString();
                     UnityEngine.Debug.Log("[Toncihana] storm lash fired: spent=" + spent
                         + " of " + ARaine_Charge.GetMaxCharge(E.Actor)
