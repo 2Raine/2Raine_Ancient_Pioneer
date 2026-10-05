@@ -58,16 +58,16 @@ namespace Toncihana
         };
 
         /// <summary>
-        /// The innate SKILL. There is exactly one, because the four abilities are its child powers
-        /// rather than four loose skills -- see Toncihana_Skills.xml and A2Raine_Toncihana_StormCalling.cs.
+        /// Empty on purpose.
         ///
-        /// Attaching it runs A2Raine_Toncihana_StormCalling.AddSkill, which attaches the four ability parts
-        /// and therefore registers their activated abilities.
+        /// This used to hold A2Raine_Toncihana_StormCalling, a BaseSkill -- which put a tree in the
+        /// Skills screen that read "already learned" even while the abilities were withheld, because
+        /// a skill tree is shown whenever the part exists. The abilities are unlocked by implanting
+        /// links now and registered by A2Raine_Toncihana_StormLinks, a plain part, so there is
+        /// nothing left for this list to grant. TryGrantSkill is kept because the repair path may
+        /// want it again; it simply has nothing to walk.
         /// </summary>
-        private static readonly string[] InnateSkills =
-        {
-            "A2Raine_Toncihana_StormCalling",
-        };
+        private static readonly string[] InnateSkills = new string[0];
 
         /// <summary>
         /// The four ability parts the skill attaches. Verified present in the load diagnostic so a
@@ -244,6 +244,17 @@ namespace Toncihana
                 {
                     TryGrantSkill(Player, name);
                 }
+
+                // --- the links: the register that holds the ability handles, and the inward eye
+                // that opens the link screen. Both are plain parts, so neither adds a skill tree.
+                // EnsureAbilities is also the load-time repair path -- it re-registers whatever the
+                // implanted links say should exist.
+                A2Raine_Toncihana_StormLinks links = Player.RequirePart<A2Raine_Toncihana_StormLinks>();
+                if (links != null)
+                {
+                    links.EnsureAbilities(Player);
+                }
+                Player.RequirePart<A2Raine_Toncihana_InwardEye>();
             }
         }
 
