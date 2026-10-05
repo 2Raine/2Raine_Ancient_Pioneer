@@ -42,6 +42,10 @@ namespace XRL.World.Parts
                 if (eater != null)
                 {
                     eater.ModIntProperty(CHARGE_PROPERTY, Amount);
+                    // Says so in the log, so a silent miss is distinguishable from a stone that
+                    // simply never carried this part (objects do not re-read their blueprint).
+                    UnityEngine.Debug.Log("[Toncihana] spirit stone eaten by " + eater.Blueprint
+                        + "; " + CHARGE_PROPERTY + "=" + eater.GetIntProperty(CHARGE_PROPERTY));
                     if (eater.IsPlayer())
                     {
                         IComponent<GameObject>.AddPlayerMessage(Message);
