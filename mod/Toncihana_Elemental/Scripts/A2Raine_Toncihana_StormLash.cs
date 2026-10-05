@@ -37,7 +37,7 @@ namespace XRL.World.Parts
         public int BaseVoltage = 3;
 
         /// <summary>Damage dice at level 0.</summary>
-        public int BaseDice = 2;
+        public int BaseDice = 1;
 
         /// <summary>
         /// LINEAR term: levels per extra die. Deliberately 0 by default -- a straight line is the

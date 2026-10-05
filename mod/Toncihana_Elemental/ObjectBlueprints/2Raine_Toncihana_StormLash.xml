@@ -9,7 +9,7 @@
           ShotsPerAction="1" AmmoPerAction="1" ShotsPerAnimation="1" WeaponAccuracy="2" />
 
     <part Name="A2Raine_Toncihana_StormLash" ChargeUse="0" ProjectileObject="2Raine_StormLashBolt"
-          ChargePercent="10" BaseDice="2" LevelsPerDie="0" SquaredDiceDivisor="150" BaseVoltage="3" />
+          ChargePercent="10" BaseDice="1" LevelsPerDie="0" SquaredDiceDivisor="150" BaseVoltage="3" />
 
     <tag Name="UsesSlots" Value="Missile Weapon" />
   </object>
