@@ -8,7 +8,7 @@
     <part Name="MissileWeapon" Skill="Pistol" AmmoChar="&amp;W*"
           ShotsPerAction="1" AmmoPerAction="1" ShotsPerAnimation="1" WeaponAccuracy="2" />
 
-    <part Name="EnergyAmmoLoader" ChargeUse="0" ProjectileObject="2Raine_StormLashBolt" />
+    <part Name="ElectricalDischargeLoader" ChargeUse="0" ProjectileObject="2Raine_StormLashBolt" />
 
     <part Name="A2Raine_Toncihana_StormLash" ChargePerShot="200" />
 
