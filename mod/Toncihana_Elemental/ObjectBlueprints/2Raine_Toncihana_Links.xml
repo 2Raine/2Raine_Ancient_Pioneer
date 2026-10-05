@@ -6,8 +6,9 @@
     	<part Name="Render" DisplayName="{{W|link of the steady aim}}" Tile="Items/sw_flexors.bmp"
     	      TileColor="&amp;c" DetailColor="C" />
     	<part Name="Description" Short="Something in the wrist remembers a hand it never had, and steadies it." />
-    	<part Name="CyberneticsBaseItem" Slots="Hands" Cost="0" BehaviorDescription="+1 Agility, +1 Ego" />
-    	<part Name="CyberneticsStatModifier" Stats="Agility:1;Ego:1" />
+    	<part Name="CyberneticsBaseItem" Slots="Hands" Cost="0" BehaviorDescription="+1 to hit, +1 Ego" />
+    	<part Name="CyberneticsStatModifier" Stats="Ego:1" />
+    	<part Name="CyberneticsPropertyModifier" Props="MeleeHitBonus:1" />
   	</object>
 
   	<object Name="2Raine_Toncihana_Link_Feet" Inherits="BaseCyberneticsEquipment_2point">

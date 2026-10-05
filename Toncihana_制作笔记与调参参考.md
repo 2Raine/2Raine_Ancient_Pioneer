@@ -2407,3 +2407,37 @@ Becoming 用过三层，成本递增：
   （`GameObjectCyberneticsUnit.Implant`，已核实**无种族/许可拦截**；`implant 蓝图名:槽位` 可直接测试）
 - 技能解锁：`MeetsRequirements` override 读这个 IntProperty
 - 那条"引擎支持但原版没用过"的现成属性也别忘：`<power Requires="技能名或突变名">`
+
+### 八、"to hit" 在哪 —— 以及一次查证方法的教训
+
+**命中加成是角色级 property**，不是只有武器才有（`GetToHitModifierEvent.cs:73-74`）：
+
+```csharp
+int num = Bonus + Actor.StatMod("Agility") + Actor.GetIntProperty("HitBonus")
+        + (Weapon?.GetIntProperty("HitBonus") ?? 0) + (Target?.GetIntProperty("IncomingHitBonus") ?? 0);
+// 近战时再叠加 Actor.GetIntProperty("MeleeHitBonus") / Weapon 的同名 property
+```
+
+所以给"植入体 / 装备"加命中，直接：
+
+```xml
+<part Name="CyberneticsPropertyModifier" Props="MeleeHitBonus:1" />
+```
+
+**两种"to hit"要分清**：
+
+| 加在哪 | 字段 | 原版实例 |
+| --- | --- | --- |
+| **武器**上 | `MeleeWeapon.HitBonus` | `Fist of the Ape God`（`Items.xml:1530`）`HitBonus="3"` |
+| **角色**上 | property `HitBonus` / `MeleeHitBonus` / `MissileHitBonus` / `ThrownHitBonus` | 见上面的 `GetToHitModifierEvent` |
+
+原版义体给命中的**另一种**做法是 `CyberneticsFistReplacement FistObject="..."` —— 把拳头**替换**成一个带 `HitBonus` 的武器蓝图
+（workshop mod `3785951358/ObjectBlueprints.xml:2-7` 的 `Ashe_ApeHandBones`）。**但那会连攻击方式一起换掉**，
+只想加命中就别用它。
+
+**教训（方法论）**：我一开始搜 `MeleeToHit`、`ToHitBonus` 全落空，就下了
+"Qud 没有角色级命中 property"的结论 —— **错**。原因是我按**自己猜的 property 名**去搜，
+而不是**按部件字段去列**。正确做法（本文件第一节就写着）：`qud.py mech MeleeWeapon`
+直接把 `HitBonus` 列出来，再顺着它摸到 `GetToHitModifierEvent`。
+
+> **搜不到 ≠ 不存在 —— 先怀疑自己的搜法。**
