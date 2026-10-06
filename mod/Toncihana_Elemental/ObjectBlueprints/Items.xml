@@ -65,7 +65,8 @@
     <part Name="Commerce" Value="10" />
 
     <part Name="AnimatedMaterialGeneric" AnimationLength="200"
-          ColorStringAnimationFrames="0=&amp;W,66=&amp;Y,132=&amp;w" />
+          ColorStringAnimationFrames="0=&amp;W,66=&amp;Y,132=&amp;w"
+          DetailColorAnimationFrames="0=W,66=Y,132=w" />
 
     <part Name="Food" Satiation="Snack" Thirst="0" Healing="0"
           Message="It dissolves on your tongue and is simply gone." />

@@ -2,7 +2,7 @@
 <objects>
 
   <object Name="Creature" Load="Merge">
-    <part Name="A2Raine_SpiritStoneDrop" Chance="1" Blueprint="2Raine_SpiritStone" />
+    <part Name="A2Raine_SpiritStoneDrop" Chance="50" Blueprint="2Raine_SpiritStone" />
   </object>
 
 </objects>
