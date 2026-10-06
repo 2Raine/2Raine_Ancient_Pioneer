@@ -100,16 +100,7 @@ namespace XRL.World.Parts
                 if (discharge != null)
                 {
                     int level = E.Actor.Stat("Level");
-                    int dice = BaseDice;
-                    if (LevelsPerDie > 0)
-                    {
-                        dice += level / LevelsPerDie;
-                    }
-                    if (SquaredDiceDivisor > 0)
-                    {
-                        dice += level * level / SquaredDiceDivisor;
-                    }
-                    discharge.DamageRange = dice + "d4";
+                    discharge.DamageRange = DiceFor(level) + "d4";
                     discharge.Voltage = BaseVoltage.ToString();
                     UnityEngine.Debug.Log("[Toncihana] storm lash fired: spent=" + spent
                         + " of " + ARaine_Charge.GetMaxCharge(E.Actor)
@@ -120,6 +111,47 @@ namespace XRL.World.Parts
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// The damage the shot rolls: a base number of d4 plus a squared term, because level
+        /// arrivals are front-loaded and a purely linear curve peaks far too early (see the notes).
+        /// </summary>
+        public int DiceFor(int Level)
+        {
+            int dice = BaseDice;
+            if (LevelsPerDie > 0)
+            {
+                dice += Level / LevelsPerDie;
+            }
+            if (SquaredDiceDivisor > 0)
+            {
+                dice += Level * Level / SquaredDiceDivisor;
+            }
+            return dice;
+        }
+
+        public override bool WantEvent(int ID, int cascade)
+        {
+            return base.WantEvent(ID, cascade) || ID == GetDisplayNameEvent.ID;
+        }
+
+        /// <summary>
+        /// Arc Winder reads as "yellow heart 4d4" because ElectricalDischargeLoader answers
+        /// GetDisplayNameEvent (ElectricalDischargeLoader.cs:265-275) with its own damage roll.
+        /// EnergyAmmoLoader has no such handler, so this weapon showed only its penetration --
+        /// which is not what it deals. U+0003 is CP437's heart, the very character that loader
+        /// uses; the roll is recomputed per level, matching what LoadAmmoEvent will fire.
+        /// </summary>
+        public override bool HandleEvent(GetDisplayNameEvent E)
+        {
+            if (E.Understood())
+            {
+                GameObject wielder = ParentObject.Equipped;
+                int level = wielder != null ? wielder.Stat("Level") : 1;
+                E.AddTag("{{W|" + '\u0003' + "}}" + DiceFor(level) + "d4", -20);
+            }
+            return base.HandleEvent(E);
         }
     }
 }
