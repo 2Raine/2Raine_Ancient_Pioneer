@@ -60,8 +60,11 @@ for path in sorted(xml_files):
 # Creature blueprints reference the CLASS, unspaced -- every vanilla <mutation Name=...> on a
 # creature is unspaced. So the borrowing has to use "ElectricalGeneration", never
 # "Electrical Generation", and the validator below would otherwise flag it as a naming breach.
+# Creature is vanilla's base creature blueprint: this mod merges a part onto it with
+# Load="Merge" so that every creature gets it, which is the supported way to reach them all.
 BORROWED_OK = re.compile(r"^(Tactics_|Survival_|CookingAndGathering|Cudgel$|"
-                         r"ElectricalGeneration$|ElectromagneticPulse$|Regeneration$)")
+                         r"ElectricalGeneration$|ElectromagneticPulse$|Regeneration$|"
+                         r"Creature$)")
 PREFIX = re.compile(r"^(A?2Raine_)")
 TILE_OK = re.compile(r"^[A-Za-z_]+/")     # vanilla tile paths like Creatures/caste_16.bmp
 

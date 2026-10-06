@@ -16,7 +16,7 @@ namespace XRL.World.Parts
     [HasWishCommand]
     public static class A2Raine_SpiritStoneWish
     {
-        public const string STONE_BLUEPRINT = "2Raine_SpiritStone_Lightning";
+        public const string STONE_BLUEPRINT = "2Raine_SpiritStone";
 
         [WishCommand("spiritstone", null)]
         public static void WishSpiritStone(string Argument)

@@ -45,7 +45,7 @@ namespace XRL.World.Parts
     /// player: kill the elemental, pick the stone off the ground.
     ///
     /// Configuration is by XML attribute, so one part serves every elemental type:
-    ///     &lt;part Name="A2Raine_BornEquipped" Blueprint="2Raine_SpiritStone_Lightning" /&gt;
+    ///     &lt;part Name="A2Raine_BornEquipped" Blueprint="2Raine_SpiritStone" /&gt;
     /// </summary>
     [Serializable]
     public class A2Raine_BornEquipped : IPart

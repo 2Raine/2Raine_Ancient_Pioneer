@@ -78,18 +78,6 @@
     <tag Name="ChooseToPreserve" />
   </object>
 
-  <object Name="2Raine_SpiritStone_Lightning" Inherits="2Raine_SpiritStone">
-    <part Name="Render" DisplayName="{{W|lightning}} spirit stone"
-          ColorString="&amp;W" DetailColor="c" />
-
-    <part Name="Description" Short="A shard of standing weather, rounded the way a river rounds a stone. Something inside it is still counting the seconds between itself and the ground." />
-
-    <part Name="AnimatedMaterialGeneric" AnimationLength="120"
-          ColorStringAnimationFrames="0=&amp;W,40=&amp;C,80=&amp;c" DetailColorAnimationFrames="0=c,40=W,80=&amp;Y" />
-
-    <part Name="PreservableItem" Result="2Raine_SpiritStonePowder_Lightning" Number="3" />
-  </object>
-
   <object Name="2Raine_SpiritStonePowder" Inherits="Preservable">
     <part Name="Render" DisplayName="spirit stone powder" RenderString="%" RenderLayer="5"
           Tile="Items/sw_paste.bmp" ColorString="&amp;B" TileColor="&amp;b" DetailColor="C" />
@@ -98,14 +86,7 @@
 
     <part Name="Commerce" Value="8" />
 
-    <part Name="PreparedCookingIngredient" type="electric" charges="1" />
-  </object>
-
-  <object Name="2Raine_SpiritStonePowder_Lightning" Inherits="2Raine_SpiritStonePowder">
-    <part Name="Render" DisplayName="{{W|lightning}} spirit stone powder"
-          ColorString="&amp;W" TileColor="&amp;c" DetailColor="C" />
-
-    <part Name="Description" Short="What a lightning spirit stone leaves behind once the weather has been salted out of it: a fine, faintly warm grit that tastes of the moment before a strike." />
+    <part Name="PreparedCookingIngredient" type="HP" charges="1" />
   </object>
 
 </objects>
