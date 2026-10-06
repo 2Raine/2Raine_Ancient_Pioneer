@@ -16,6 +16,8 @@
   </object>
 
   <object Name="2Raine_StormLashBolt" Inherits="ProjectileElectroPistol">
+    <part Name="Projectile" BasePenetration="0" BaseDamage="0"
+          Attributes="Electric NonPenetrating" ColorString="&amp;W" PassByVerb="fly" />
     <part Name="DischargeOnHit" DamageRange="2d6" Voltage="4" />
   </object>
 

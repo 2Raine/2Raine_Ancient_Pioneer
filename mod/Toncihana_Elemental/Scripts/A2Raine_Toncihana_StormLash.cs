@@ -142,6 +142,11 @@ namespace XRL.World.Parts
         /// EnergyAmmoLoader has no such handler, so this weapon showed only its penetration --
         /// which is not what it deals. U+0003 is CP437's heart, the very character that loader
         /// uses; the roll is recomputed per level, matching what LoadAmmoEvent will fire.
+        ///
+        /// The penetration readout is switched off separately, with Attributes="... NonPenetrating"
+        /// on the projectile (see 2Raine_Toncihana_StormLash.xml). GetDisplayNameEvent.cs:240 is
+        /// what honours that word, and MissileWeapon.cs:1769 pins actual penetration to 1 when it
+        /// is present -- correct here, since the shot deals its damage through DischargeOnHit.
         /// </summary>
         public override bool HandleEvent(GetDisplayNameEvent E)
         {
