@@ -147,6 +147,14 @@ powershell -File publish.ps1 "说明这次改了什么"
   把定义那行 grep 出来（`Inherits=` / `Anatomy=` / `BodyObject=`）—— **引用比回忆可靠**。
   实例：曾把 Elemental 生物的 `2Raine_Elemental_HeadBlow` 说成 Toncihana 的攻击方式，
   而三条躯体就挤在同一个文件里（`2Raine_Toncihana_Bodies.xml`）。**读到 ≠ 记住。**
+- **报机制结论时，先找"谁会破例"。** 一句"X 永远如此"必须顶得住反例，而那些反例往往**不在
+  你查的那一层**：查 `Zone` / `ZoneManager` 只会看到"区域冻结、内容原样读回"，
+  而破例的是**部件层**的惰性补算 —— `GenericInventoryRestocker.TurnTick`
+  （`XRL/World/Parts/GenericInventoryRestocker.cs:125-142`）在玩家回来时拿
+  `The.Game.TimeTicks` 和自己的 `LastRestockTick` 比差值，超过 6000 回合就补货。
+  **结构层找不到的例外，去部件层找；找过再下断言。**
+  实例：曾断言"区域内容永不随时间流逝改变"，被商人补货当场推翻，且因此漏掉了
+  "世界时间在冻结期间照常推进"这个关键事实。
 
 ---
 
