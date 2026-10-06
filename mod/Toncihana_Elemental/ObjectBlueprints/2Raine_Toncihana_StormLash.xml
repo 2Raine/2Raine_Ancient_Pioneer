@@ -2,7 +2,8 @@
 <objects>
 
   <object Name="2Raine_Toncihana_StormLash" Inherits="NaturalMissileWeapon">
-    <part Name="Render" DisplayName="standing storm" ColorString="&amp;W" DetailColor="c" />
+    <part Name="Render" DisplayName="standing storm" Tile="Items/sw_techpistol_6.bmp"
+          TileColor="&amp;w" ColorString="&amp;W" DetailColor="c" />
     <part Name="Description" Short="The air at the end of the arm keeps a small weather of its own, and it is always about to break." />
 
     <part Name="MissileWeapon" Skill="Pistol" AmmoChar="&amp;W*"
