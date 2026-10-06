@@ -33,7 +33,8 @@ namespace XRL.World.Parts
 
         public override void Initialize()
         {
-            ActivatedAbilityID = AddMyActivatedAbility("Devour", COMMAND_NAME, "Skill");
+            ActivatedAbilityID = AddMyActivatedAbility("Devour", COMMAND_NAME, "Skill",
+                "Absorb every spirit stone you carry, all at once.");
             base.Initialize();
         }
 
