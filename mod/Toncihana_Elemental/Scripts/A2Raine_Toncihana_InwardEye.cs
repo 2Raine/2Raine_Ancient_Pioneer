@@ -53,7 +53,8 @@ namespace XRL.World.Parts
 
         public override void Initialize()
         {
-            ActivatedAbilityID = AddMyActivatedAbility("Inward Eye", COMMAND_NAME, "Skill");
+            ActivatedAbilityID = AddMyActivatedAbility("Inward Eye", COMMAND_NAME, "Skill",
+                "Turn the eye inward, and see how you are linked to sky and earth.");
             base.Initialize();
         }
 
