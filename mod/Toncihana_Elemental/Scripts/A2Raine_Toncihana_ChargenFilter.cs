@@ -5,6 +5,7 @@ using XRL;
 using XRL.CharacterBuilds.Qud;
 using XRL.CharacterBuilds.Qud.UI;
 using XRL.UI.Framework;
+using XRL.World.Parts.Mutation;
 
 namespace XRL.World.Parts
 {
@@ -77,27 +78,64 @@ namespace XRL.World.Parts
 
             try
             {
-                System.Reflection.MethodInfo target = AccessTools.Method(
+                System.Reflection.MethodInfo picker = AccessTools.Method(
                     typeof(QudMutationsModuleWindow), "ClearNodes");
 
-                if (target == null)
+                if (picker == null)
                 {
                     UnityEngine.Debug.LogError("[Toncihana] chargen filter: ClearNodes not found;"
-                        + " vanilla Electrical Generation stays selectable for Toncihana.");
-                    return;
+                        + " vanilla Electrical Generation stays selectable in character creation.");
+                }
+                else
+                {
+                    new Harmony("2Raine.Toncihana.ChargenFilter").Patch(
+                        picker,
+                        postfix: new HarmonyMethod(AccessTools.Method(
+                            typeof(A2Raine_Toncihana_ChargenFilter), "ClearNodesPostfix")));
+
+                    Patches attached = Harmony.GetPatchInfo(picker);
+                    int postfixCount = attached == null ? -1 : attached.Postfixes.Count;
+
+                    UnityEngine.Debug.Log("[Toncihana] chargen filter installed: '" + HIDDEN_MUTATION
+                        + "' is hidden for genotypes using body '" + OUR_BODY
+                        + "'. patch info on ClearNodes: postfix=" + postfixCount);
                 }
 
-                new Harmony("2Raine.Toncihana.ChargenFilter").Patch(
-                    target,
-                    postfix: new HarmonyMethod(AccessTools.Method(
-                        typeof(A2Raine_Toncihana_ChargenFilter), "Postfix")));
+                // The mutate pool is a SEPARATE path from the charge screen, and it is the one that
+                // matters once the game is running: buying mutations from the status screen
+                // (StatusScreen.cs:655), water rituals (WaterRitualRandomMutation.cs:50), the endgame
+                // (EndGame.cs:674) and PsychicHunterSystem all go through Mutations.GetMutatePool
+                // (Mutations.cs:887). Patching that one static method covers every one of them.
+                System.Reflection.MethodInfo pool = AccessTools.Method(
+                    typeof(Mutations),
+                    "GetMutatePool",
+                    new Type[]
+                    {
+                        typeof(GameObject),
+                        typeof(List<BaseMutation>),
+                        typeof(Predicate<MutationEntry>),
+                        typeof(bool)
+                    });
 
-                Patches attached = Harmony.GetPatchInfo(target);
-                int postfixCount = attached == null ? -1 : attached.Postfixes.Count;
+                if (pool == null)
+                {
+                    UnityEngine.Debug.LogError("[Toncihana] mutation pool filter: GetMutatePool not"
+                        + " found; vanilla Electrical Generation stays in the pool.");
+                }
+                else
+                {
+                    new Harmony("2Raine.Toncihana.MutationPool").Patch(
+                        pool,
+                        postfix: new HarmonyMethod(AccessTools.Method(
+                            typeof(A2Raine_Toncihana_ChargenFilter), "MutatePoolPostfix")));
 
-                UnityEngine.Debug.Log("[Toncihana] chargen filter installed: '" + HIDDEN_MUTATION
-                    + "' is hidden for genotypes using body '" + OUR_BODY
-                    + "'. patch info on ClearNodes: postfix=" + postfixCount);
+                    Patches attached = Harmony.GetPatchInfo(pool);
+                    int postfixCount = attached == null ? -1 : attached.Postfixes.Count;
+
+                    UnityEngine.Debug.Log("[Toncihana] mutation pool filter installed: '"
+                        + HIDDEN_MUTATION + "' is kept out of the pool for body '" + OUR_BODY
+                        + "'. patch info on GetMutatePool: postfix=" + postfixCount);
+                }
             }
             catch (Exception e)
             {
@@ -106,7 +144,7 @@ namespace XRL.World.Parts
         }
 
         /// <summary>Drops the borrowed mutation from the picker, but only for our genotype.</summary>
-        public static void Postfix(QudMutationsModuleWindow __instance)
+        public static void ClearNodesPostfix(QudMutationsModuleWindow __instance)
         {
             try
             {
@@ -197,6 +235,51 @@ namespace XRL.World.Parts
             catch (Exception e)
             {
                 UnityEngine.Debug.LogError("[Toncihana] chargen filter postfix failed: " + e);
+            }
+        }
+
+        /// <summary>
+        /// Keeps the borrowed mutation out of the mutate pool once the game is running: buying
+        /// mutations from the status screen, water rituals, the endgame and PsychicHunterSystem all
+        /// call Mutations.GetMutatePool (Mutations.cs:887). Postfix on that one method therefore
+        /// covers every route, instead of patching each UI in turn.
+        ///
+        /// The test is the CURRENT BODY, not a saved flag and not the MutationLevel property --
+        /// MutationLevel is vanilla's slot for the Chimera/Esper paths (QudMutationsModule.cs:99,
+        /// :103) and taking it would break both. A dominated Toncihana is no longer in this body,
+        /// so the filter stops matching and the new body may take vanilla Electrical Generation.
+        /// </summary>
+        public static void MutatePoolPostfix(GameObject who, List<MutationEntry> __result)
+        {
+            try
+            {
+                if (who == null || __result == null || __result.Count == 0)
+                {
+                    return;
+                }
+
+                if (!who.HasPart<A2Raine_Toncihana_Physiology>())
+                {
+                    return;
+                }
+
+                int removed = 0;
+                for (int i = __result.Count - 1; i >= 0; i--)
+                {
+                    if (__result[i] != null && __result[i].Name == HIDDEN_MUTATION)
+                    {
+                        __result.RemoveAt(i);
+                        removed++;
+                    }
+                }
+
+                UnityEngine.Debug.Log("[Toncihana] mutation pool filter: body='"
+                    + who.Blueprint + "', removed " + removed + " entry/entries for '"
+                    + HIDDEN_MUTATION + "'.");
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError("[Toncihana] mutation pool postfix failed: " + e);
             }
         }
     }
