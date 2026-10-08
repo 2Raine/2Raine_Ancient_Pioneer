@@ -97,6 +97,7 @@ namespace Toncihana
             // Install here as well as in the load callback below. Install() is idempotent, so
             // reaching either entry point is enough.
             A2Raine_Toncihana_MutationGuard.Install();
+            A2Raine_Toncihana_MutationPoolFilter.Install();
 
             UnityEngine.Debug.LogWarning("[Toncihana] PlayerMutator fired. genotype='"
                 + SafeGenotype(player) + "'");
@@ -110,6 +111,7 @@ namespace Toncihana
             try
             {
                 A2Raine_Toncihana_MutationGuard.Install();
+                A2Raine_Toncihana_MutationPoolFilter.Install();
 
                 GameObject player = PlayerBody();
                 if (player == null)
