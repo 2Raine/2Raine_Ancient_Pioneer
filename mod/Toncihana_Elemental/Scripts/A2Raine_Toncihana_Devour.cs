@@ -7,16 +7,24 @@ using XRL.World;
 namespace XRL.World.Parts
 {
     /// <summary>
-    /// Devour: swallow every spirit stone in the pack in one action.
+    /// Devour: swallow every spirit stone you carry in one action.
     ///
     /// WHY THIS EXISTS
     /// ---------------
     /// Vanilla's eat path (Food.cs:124-217) handles one item per action and prints a line for each,
     /// so working through a pile of stones is a lot of keystrokes for no decision-making. This does
-    /// the same arithmetic in one go: sum the Amount of every A2Raine_SpiritStoneMeal in the
-    /// inventory, destroy them the way Food does (ParentObject.Destroy, Food.cs:215), add the total
-    /// to the charge counter, and charge the same single action's energy Food would
-    /// (UseEnergy(1000, "Item Eat"), Food.cs:211).
+    /// the same arithmetic once: sum the Amount of every A2Raine_SpiritStoneMeal carried, destroy
+    /// them the way Food does (ParentObject.Destroy, Food.cs:215), add the total to the charge
+    /// counter, and charge one action's energy (UseEnergy(1000, "Item Eat"), Food.cs:211).
+    ///
+    /// WHY IT WALKS CONTAINERS BY HAND
+    /// -------------------------------
+    /// Qud's GameObject.GetInventory* family has no recursive form -- every overload stops at the
+    /// top level (GameObject.cs:5367-5504). Two earlier versions used those and both ate exactly
+    /// one stone out of a pile, because stones sitting inside a carried container are invisible to
+    /// all of them. CollectStones therefore recurses into anything that has an Inventory of its
+    /// own, and takes equipped stones too (a spirit stone inherits Floating Glowsphere, so it can
+    /// occupy a body's Floating Nearby).
     ///
     /// WHAT IT DELIBERATELY SKIPS
     /// --------------------------
@@ -78,49 +86,20 @@ namespace XRL.World.Parts
                 return;
             }
 
-            // GetInventoryDirectAndEquipment, not GetInventoryDirect: a spirit stone inherits
-            // Floating Glowsphere, so it can sit in an equipment slot (the Elemental body has a
-            // Floating Nearby), and GetInventoryDirect only walks Inventory.Objects -- equipped
-            // stones were invisible to the old version, which is why devouring a pile ate one at
-            // a time.
-            List<GameObject> stones = who.GetInventoryDirectAndEquipment(
-                (GameObject go) => go.HasPart<A2Raine_SpiritStoneMeal>());
-
-            if (stones == null || stones.Count == 0)
-            {
-                Popup.ShowFail("You are carrying no spirit stones.");
-                return;
-            }
-
-            // Collect FIRST, destroy after. Walking the list we just read while destroying objects
-            // out of it is the kind of thing that works until it doesn't, and the two previous
-            // attempts both came back as "only one stone eaten" -- so the collecting and the
-            // destroying are now separate passes, and the diagnostic reports what each pass saw.
+            // Collect first, destroy after: never mutate the world while walking the list we took
+            // from it.
             List<GameObject> toEat = new List<GameObject>();
             int total = 0;
-            string detail = "";
-
-            foreach (GameObject stone in stones)
-            {
-                A2Raine_SpiritStoneMeal meal = stone.GetPart<A2Raine_SpiritStoneMeal>();
-                if (meal == null)
-                {
-                    detail += " " + stone.Blueprint + "(no-meal-part)";
-                    continue;
-                }
-                toEat.Add(stone);
-                total += meal.Amount;
-                detail += " " + stone.Blueprint + "(" + meal.Amount + ")";
-            }
-
-            UnityEngine.Debug.Log("[Toncihana] devour: found " + stones.Count + ", eatable "
-                + toEat.Count + ", total " + total + ":" + detail);
+            CollectStones(who, toEat, ref total);
 
             if (toEat.Count == 0)
             {
                 Popup.ShowFail("You are carrying no spirit stones.");
                 return;
             }
+
+            UnityEngine.Debug.Log("[Toncihana] devour: found " + toEat.Count + " stone(s), total "
+                + total + " charge.");
 
             foreach (GameObject stone in toEat)
             {
@@ -137,6 +116,54 @@ namespace XRL.World.Parts
             Popup.Show("{{W|You swallow " + count + " spirit stone"
                 + ((count == 1) ? "" : "s")
                 + " at once. Something in you takes all of it and keeps it.}}");
+        }
+
+        /// <summary>
+        /// Gathers every spirit stone the creature carries -- equipped, loose in the pack, or
+        /// nested any number of containers deep -- because none of Qud's own inventory helpers
+        /// descends into containers.
+        /// </summary>
+        private static void CollectStones(GameObject Host, List<GameObject> Into, ref int Total)
+        {
+            List<GameObject> carried;
+
+            try
+            {
+                carried = Host.GetInventoryAndEquipment();
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError("[Toncihana] devour: could not read the contents of "
+                    + Host.Blueprint + ": " + e);
+                return;
+            }
+
+            if (carried == null)
+            {
+                return;
+            }
+
+            foreach (GameObject item in carried)
+            {
+                if (item == null)
+                {
+                    continue;
+                }
+
+                A2Raine_SpiritStoneMeal meal = item.GetPart<A2Raine_SpiritStoneMeal>();
+                if (meal != null)
+                {
+                    Into.Add(item);
+                    Total += meal.Amount;
+                    continue;
+                }
+
+                // Not a stone -- but if it is a container, its contents count as carried too.
+                if (item.HasPart<Inventory>())
+                {
+                    CollectStones(item, Into, ref Total);
+                }
+            }
         }
     }
 }
