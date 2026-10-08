@@ -30,7 +30,7 @@ namespace XRL.World.Parts
     [Serializable]
     public class A2Raine_SpiritStoneDrop : IPart
     {
-        /// <summary>Percent chance per creature.</summary>
+        /// <summary>Chance per creature, IN THOUSANDTHS (1 = one in a thousand).</summary>
         public int Chance = 1;
 
         public string Blueprint = "2Raine_SpiritStone";
@@ -45,10 +45,25 @@ namespace XRL.World.Parts
             // The event goes to the dying creature's own parts (that is how Corpse uses it), so
             // ParentObject is the one dying. The player is excluded: they are a Creature too, and
             // would otherwise be born holding a stone.
-            if (!ParentObject.IsPlayer() && Chance.in100())
+            if (ParentObject.IsPlayer())
+            {
+                return base.HandleEvent(E);
+            }
+
+            // Anything already carrying a spirit stone rolls nothing: the Elemental creatures are
+            // born with one already (A2Raine_BornEquipped in Creatures.xml), and rolling for a
+            // second would double up. Written as "already has one" rather than as a list of
+            // blueprints so it stays true if more carriers are added later.
+            if (ParentObject.HasPart<A2Raine_SpiritStoneMeal>())
+            {
+                return base.HandleEvent(E);
+            }
+
+            if (Chance.in1000())
             {
                 Drop();
             }
+
             return base.HandleEvent(E);
         }
 
