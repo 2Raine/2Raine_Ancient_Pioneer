@@ -358,6 +358,14 @@ DSH 那边的工具**恰好也叫 `pwsh`**，但那是宿主自带的工具名�
     时顺手在 `2Raine_Toncihana_StormLash.xml` 里解释了一遍理由，那是把 C# 的注释习惯
     带进了 XML。
 
+14. **模组代码只能写 C# 5 —— 不要用 `?.`、`nameof`、字符串插值 `$"..."`、`=>` 成员体。**
+    `check_csharp.ps1` 调的是 .NET 4.0 的 `csc.exe`（`Microsoft.NET\Framework64\v4.0.30319`），
+    它按 C# 5 解析；游戏自身的 Unity 编译器**支持**新语法，所以这类错误**只会在自检里出现**，
+    很容易被当成"游戏能跑就行"。踩过：`Object.GetPart<Mutations>()?.GetMutation(...)`
+    报 `CS1525 无效的表达式项`，`nameof(Prefix)` 报 `CS0103 不存在名称 'nameof'`
+    —— 报错行号与实际原因分离，第一眼看不出是语法版本问题。
+    替代写法：显式 null 判断、字符串字面量、`string.Format` / `+` 拼接。
+
 更完整的坑与做法见 `Caves of Qud 模组制作入门指南.md`。
 
 ---
