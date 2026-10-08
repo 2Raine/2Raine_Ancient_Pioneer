@@ -160,6 +160,14 @@ powershell -File publish.ps1 "说明这次改了什么"
   把定义那行 grep 出来（`Inherits=` / `Anatomy=` / `BodyObject=`）—— **引用比回忆可靠**。
   实例：曾把 Elemental 生物的 `2Raine_Elemental_HeadBlow` 说成 Toncihana 的攻击方式，
   而三条躯体就挤在同一个文件里（`2Raine_Toncihana_Bodies.xml`）。**读到 ≠ 记住。**
+- **数量/次数不对时，先确认"一个对象代表几个"，再猜它在哪里。**
+  Qud 的物品可以堆叠：**一个 `GameObject` 可能是一整堆**，数量在 `GameObject.Count`
+  （`XRL/World/GameObject.cs:617-634`，即 `Stacker.Number`，无 Stacker 时为 1）。
+  于是"只处理了 1 个"这种症状，第一嫌疑是**按对象计数而不是按堆叠数量结算**，
+  而不是"它没被找到"。
+  踩过：`Devour` 吃一堆精灵石只加 1 点充能，我连续两次推断成"石头被装备了所以遍历不到"
+  和"石头在容器里所以遍历不到"，都为它写了一套"递归收集"的设法；真因只有一句 ——
+  `total += meal.Amount` 漏掉了 `× item.Count`。**先读物品自己的属性，再谈它在哪。**
 - **报机制结论时，先找"谁会破例"。** 一句"X 永远如此"必须顶得住反例，而那些反例往往**不在
   你查的那一层**：查 `Zone` / `ZoneManager` 只会看到"区域冻结、内容原样读回"，
   而破例的是**部件层**的惰性补算 —— `GenericInventoryRestocker.TurnTick`
