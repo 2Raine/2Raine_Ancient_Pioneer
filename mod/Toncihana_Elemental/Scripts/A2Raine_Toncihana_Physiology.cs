@@ -611,6 +611,16 @@ namespace XRL.World.Parts
         public int ProjectileHitsSeen = 0;
 
         /// <summary>
+        /// Whether the one-time search for a leftover DisabledNaturalHealing part has run.
+        ///
+        /// HasPart&lt;T&gt; is a LINEAR SCAN of the part list (GameObject.cs:9444-9453), not a lookup,
+        /// so asking every turn would walk every part of every Toncihana on every turn. The part can
+        /// only be present before the first check -- it is removed here and cannot come back -- so a
+        /// single pass is enough. Appended at the very end, like every field in this class.
+        /// </summary>
+        public bool NaturalHealingBlockerChecked = false;
+
+        /// <summary>
         /// Removes vanilla's natural-healing blocker if the bearer still carries one.
         ///
         /// The blueprint no longer declares DisabledNaturalHealing, but a blueprint is only read
@@ -637,6 +647,12 @@ namespace XRL.World.Parts
         /// </summary>
         private void ClearNaturalHealingBlocker()
         {
+            if (NaturalHealingBlockerChecked)
+            {
+                return;
+            }
+            NaturalHealingBlockerChecked = true;
+
             if (ParentObject == null || !ParentObject.HasPart<DisabledNaturalHealing>())
             {
                 return;
