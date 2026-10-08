@@ -104,6 +104,8 @@ namespace Toncihana
         {
             try
             {
+                A2Raine_Toncihana_MutationGuard.Install();
+
                 GameObject player = PlayerBody();
                 if (player == null)
                 {
