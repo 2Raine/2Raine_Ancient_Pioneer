@@ -43,8 +43,13 @@ namespace XRL.World.Parts
         /// </summary>
         private const string HIDDEN_MUTATION = "Electrical Generation";
 
-        /// <summary>Genotype names are matched case-insensitively against this.</summary>
-        private const string GENOTYPE_MARKER = "Toncihana";
+        /// <summary>
+        /// The body blueprint that identifies our genotype. Matching on this rather than on a
+        /// substring of the genotype NAME is deliberate: our genotype is called
+        /// "2Raine_AncientPioneer_Elemental" (Genotypes.xml:4) and contains no "Toncihana" at all,
+        /// so a name marker silently never matched. The body is what actually defines the race.
+        /// </summary>
+        private const string OUR_BODY = "2Raine_AncientPioneer_Body";
 
         private static bool installed;
 
@@ -77,8 +82,8 @@ namespace XRL.World.Parts
                 int postfixCount = attached == null ? -1 : attached.Postfixes.Count;
 
                 UnityEngine.Debug.Log("[Toncihana] chargen filter installed: '" + HIDDEN_MUTATION
-                    + "' is hidden for genotype '" + GENOTYPE_MARKER + "'. patch info on ClearNodes:"
-                    + " postfix=" + postfixCount);
+                    + "' is hidden for genotypes using body '" + OUR_BODY
+                    + "'. patch info on ClearNodes: postfix=" + postfixCount);
             }
             catch (Exception e)
             {
@@ -102,8 +107,29 @@ namespace XRL.World.Parts
                 // The genotype THIS character is being built with -- not anything stored on a body.
                 QudGenotypeModule genotypeModule = module.builder.GetModule<QudGenotypeModule>();
                 string selected = genotypeModule == null ? null : genotypeModule.getSelected();
-                if (selected == null
-                    || selected.IndexOf(GENOTYPE_MARKER, StringComparison.OrdinalIgnoreCase) < 0)
+                if (selected == null)
+                {
+                    return;
+                }
+
+                // Ask the genotype entry what body it uses; that is the race identity.
+                bool ours = false;
+                string body = "(unknown)";
+                Dictionary<string, GenotypeEntry> byName = genotypeModule.genotypesByName;
+                if (byName != null)
+                {
+                    GenotypeEntry entry;
+                    if (byName.TryGetValue(selected, out entry) && entry != null)
+                    {
+                        body = entry.BodyObject;
+                        ours = entry.BodyObject == OUR_BODY;
+                    }
+                }
+
+                UnityEngine.Debug.Log("[Toncihana] chargen filter: genotype='" + selected
+                    + "', body='" + body + "', ours=" + ours + ".");
+
+                if (!ours)
                 {
                     return;
                 }
