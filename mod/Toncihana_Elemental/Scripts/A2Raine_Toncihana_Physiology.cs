@@ -673,6 +673,14 @@ namespace XRL.World.Parts
                 amount = 1;
             }
 
+            // DIAGNOSTIC: one line per actual heal, so the log shows how many times a turn this
+            // fires and how big each tick is. Remove once the numbers are settled.
+            UnityEngine.Debug.Log("[Toncihana] healing tick: charge=" + chargePercent + "%"
+                + ", percent=" + HealingPercent + ", roll=" + roll + ", regen="
+                + ((regeneration != null) ? regeneration.Level : 0)
+                + ", amount=" + amount
+                + ", hp=" + ParentObject.hitpoints + "/" + ParentObject.baseHitpoints);
+
             ParentObject.Heal(amount, Message: false);
         }
     }
