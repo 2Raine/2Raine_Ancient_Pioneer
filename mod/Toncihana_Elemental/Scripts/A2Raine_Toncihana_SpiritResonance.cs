@@ -65,6 +65,16 @@ namespace XRL.World.Parts.Skill
         /// </summary>
         public Guid TelepathyTracker = Guid.Empty;
 
+        /// <summary>
+        /// Whether the "starts open" default has been applied to this instance.
+        ///
+        /// Needed because DefaultToggleState only affects a NEWLY registered ability: a character
+        /// who unlocked the link before the default changed already has its handle, so Register()
+        /// returns early and the new default never reaches them. Set once, after which the
+        /// player's own choice is left alone. Append-only, like every field above.
+        /// </summary>
+        public bool OpeningDefaultApplied = false;
+
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -74,12 +84,11 @@ namespace XRL.World.Parts.Skill
 
         public override bool HandleEvent(EndTurnEvent E)
         {
-            HideRadarAbility();
+            ApplyOpeningDefaultOnce();
 
-            // The ability starts OPEN (DefaultToggleState: true), so it can be on without the
-            // player ever pressing anything -- Open()/Close() only run from the command handler.
-            // Sync from the toggle state instead, which also repairs the lent telepathy after a
-            // load, where no command fired at all.
+            // The ability normally starts OPEN, but it can also be on without the player ever
+            // pressing anything, and a load fires no command at all. Syncing from the toggle state
+            // covers both -- and repairs the lent telepathy after a load.
             if (ParentObject.IsActivatedAbilityToggledOn(AbilityID))
             {
                 LendTelepathy();
@@ -93,22 +102,23 @@ namespace XRL.World.Parts.Skill
         }
 
         /// <summary>
-        /// Keeps the implant's own "Penetrating Radar" ability out of the menu, so spirit resonance
-        /// is the one the player sees and presses and there is not a second radar switch beside it.
-        ///
-        /// The radar itself keeps working: its illumination reads that ability's toggle state
-        /// (CyberneticsPenetratingRadar.cs:48-57), so hiding it changes only whether it advertises
-        /// itself. Checked every turn because the ability is registered by the implant's own
-        /// ImplantedEvent, whose order relative to ours is not something we control.
+        /// Opens the ability once, for characters who had already unlocked it before "starts open"
+        /// became the default. DefaultToggleState only reaches a newly registered ability; an
+        /// existing character already has the handle, so Register returns early. Runs once and then
+        /// leaves the player's choice alone.
         /// </summary>
-        private void HideRadarAbility()
+        private void ApplyOpeningDefaultOnce()
         {
-            ActivatedAbilityEntry radar = ParentObject.GetActivatedAbilityByCommand(
-                CyberneticsPenetratingRadar.COMMAND_NAME);
-
-            if (radar != null && radar.Visible)
+            if (OpeningDefaultApplied)
             {
-                radar.Visible = false;
+                return;
+            }
+
+            OpeningDefaultApplied = true;
+
+            if (!ParentObject.IsActivatedAbilityToggledOn(AbilityID))
+            {
+                ParentObject.ToggleActivatedAbility(AbilityID);
             }
         }
 
@@ -133,7 +143,6 @@ namespace XRL.World.Parts.Skill
 
         private void Open()
         {
-            SetRadar(true);
             LendTelepathy();
             ARaine_Charge.Message(ParentObject,
                 "{{C|Something very far away finishes saying your name.}}");
@@ -141,30 +150,9 @@ namespace XRL.World.Parts.Skill
 
         private void Close()
         {
-            SetRadar(false);
             WithdrawTelepathy();
             ARaine_Charge.Message(ParentObject,
                 "{{K|The far voice stops mid-word. The ground goes back to being opaque.}}");
-        }
-
-        /// <summary>
-        /// Drives the implant's own radar to the wanted state. Toggling only when the states
-        /// disagree keeps this ability and the radar from drifting apart.
-        /// </summary>
-        private void SetRadar(bool On)
-        {
-            ActivatedAbilityEntry radar = ParentObject.GetActivatedAbilityByCommand(
-                XRL.World.Parts.CyberneticsPenetratingRadar.COMMAND_NAME);
-
-            if (radar == null)
-            {
-                return;
-            }
-
-            if (ParentObject.IsActivatedAbilityToggledOn(radar.ID) != On)
-            {
-                ParentObject.ToggleActivatedAbility(radar.ID);
-            }
         }
 
         /// <summary>Lends telepathy under our own tracker, so closing cannot touch other sources.</summary>

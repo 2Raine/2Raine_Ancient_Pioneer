@@ -43,7 +43,6 @@
     	<part Name="CyberneticsBaseItem" Slots="Face" Cost="0" BehaviorDescription="+1 Ego, +5% chance to refract light, telepathy, penetrating radar, compute power that grows with your level. A tenth of your charge stays occupied." />
     	<part Name="CyberneticsStatModifier" Stats="Ego:1" />
     	<part Name="CyberneticsRefractLight" Chance="5" />
-    	<part Name="CyberneticsPenetratingRadar" />
     	<part Name="A2Raine_Toncihana_ResonanceCompute" />
     	<part Name="A2Raine_Toncihana_Link" />
     	<part Name="RulesDescription" Text="+1 Ego, +5% to refract light, telepathy and penetrating radar while spirit resonance is open, +2 compute power per level, 10% of maximum charge occupied" />
