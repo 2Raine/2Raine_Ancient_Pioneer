@@ -92,28 +92,42 @@ namespace XRL.World.Parts
                 return;
             }
 
-            UnityEngine.Debug.Log("[Toncihana] devour: found " + stones.Count + " stone(s) on "
-                + who.Blueprint + ".");
-
-            int count = 0;
+            // Collect FIRST, destroy after. Walking the list we just read while destroying objects
+            // out of it is the kind of thing that works until it doesn't, and the two previous
+            // attempts both came back as "only one stone eaten" -- so the collecting and the
+            // destroying are now separate passes, and the diagnostic reports what each pass saw.
+            List<GameObject> toEat = new List<GameObject>();
             int total = 0;
+            string detail = "";
+
             foreach (GameObject stone in stones)
             {
                 A2Raine_SpiritStoneMeal meal = stone.GetPart<A2Raine_SpiritStoneMeal>();
                 if (meal == null)
                 {
+                    detail += " " + stone.Blueprint + "(no-meal-part)";
                     continue;
                 }
+                toEat.Add(stone);
                 total += meal.Amount;
-                count++;
-                stone.Destroy();
+                detail += " " + stone.Blueprint + "(" + meal.Amount + ")";
             }
 
-            if (count == 0)
+            UnityEngine.Debug.Log("[Toncihana] devour: found " + stones.Count + ", eatable "
+                + toEat.Count + ", total " + total + ":" + detail);
+
+            if (toEat.Count == 0)
             {
                 Popup.ShowFail("You are carrying no spirit stones.");
                 return;
             }
+
+            foreach (GameObject stone in toEat)
+            {
+                stone.Destroy();
+            }
+
+            int count = toEat.Count;
 
             who.ModIntProperty(A2Raine_SpiritStoneMeal.CHARGE_PROPERTY, total);
             UnityEngine.Debug.Log("[Toncihana] devoured " + count + " spirit stone(s); +"

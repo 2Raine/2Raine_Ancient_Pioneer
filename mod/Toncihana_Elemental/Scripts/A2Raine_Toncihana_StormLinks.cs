@@ -236,7 +236,7 @@ namespace XRL.World.Parts
                         Class: "Skill",
                         Description: carrier6.AbilityDescription,
                         Toggleable: true,
-                        DefaultToggleState: true);
+                        DefaultToggleState: false);
                 }
                 carrier6.AbilityID = links.SpiritResonanceAbilityID;
             }

@@ -36,6 +36,9 @@ namespace XRL.World.Parts
         /// <summary>Compute power granted per character level. 2 x 50 = 100.</summary>
         public int PowerPerLevel = 2;
 
+        /// <summary>Ceiling on the granted compute power, reached at level 50 and held there after.</summary>
+        public int MaxPower = 100;
+
         /// <summary>Base radar radius, in cells. Same default as the vanilla implant.</summary>
         public int Radius = 10;
 
@@ -49,13 +52,18 @@ namespace XRL.World.Parts
                 || ID == BeforeRenderEvent.ID;
         }
 
-        /// <summary>Supplies compute power, scaled by the bearer's level.</summary>
+        /// <summary>Supplies compute power, scaled by the bearer's level and capped.</summary>
         public override bool HandleEvent(GetAvailableComputePowerEvent E)
         {
             GameObject bearer = Bearer();
             if (bearer != null && bearer.HasStat("Level"))
             {
-                E.Amount += bearer.Stat("Level") * PowerPerLevel;
+                int power = bearer.Stat("Level") * PowerPerLevel;
+                if (MaxPower > 0 && power > MaxPower)
+                {
+                    power = MaxPower;
+                }
+                E.Amount += power;
             }
             return base.HandleEvent(E);
         }

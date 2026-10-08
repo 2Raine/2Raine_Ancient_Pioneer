@@ -65,16 +65,6 @@ namespace XRL.World.Parts.Skill
         /// </summary>
         public Guid TelepathyTracker = Guid.Empty;
 
-        /// <summary>
-        /// Whether the "starts open" default has been applied to this instance.
-        ///
-        /// Needed because DefaultToggleState only affects a NEWLY registered ability: a character
-        /// who unlocked the link before the default changed already has its handle, so Register()
-        /// returns early and the new default never reaches them. Set once, after which the
-        /// player's own choice is left alone. Append-only, like every field above.
-        /// </summary>
-        public bool OpeningDefaultApplied = false;
-
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)
@@ -84,11 +74,9 @@ namespace XRL.World.Parts.Skill
 
         public override bool HandleEvent(EndTurnEvent E)
         {
-            ApplyOpeningDefaultOnce();
-
-            // The ability normally starts OPEN, but it can also be on without the player ever
-            // pressing anything, and a load fires no command at all. Syncing from the toggle state
-            // covers both -- and repairs the lent telepathy after a load.
+            // The ability can be on without the player ever pressing anything (it may have been
+            // opened before this session), and a load fires no command at all. Syncing from the
+            // toggle state covers both -- and repairs the lent telepathy after a load.
             if (ParentObject.IsActivatedAbilityToggledOn(AbilityID))
             {
                 LendTelepathy();
@@ -99,27 +87,6 @@ namespace XRL.World.Parts.Skill
             }
 
             return base.HandleEvent(E);
-        }
-
-        /// <summary>
-        /// Opens the ability once, for characters who had already unlocked it before "starts open"
-        /// became the default. DefaultToggleState only reaches a newly registered ability; an
-        /// existing character already has the handle, so Register returns early. Runs once and then
-        /// leaves the player's choice alone.
-        /// </summary>
-        private void ApplyOpeningDefaultOnce()
-        {
-            if (OpeningDefaultApplied)
-            {
-                return;
-            }
-
-            OpeningDefaultApplied = true;
-
-            if (!ParentObject.IsActivatedAbilityToggledOn(AbilityID))
-            {
-                ParentObject.ToggleActivatedAbility(AbilityID);
-            }
         }
 
         public override bool HandleEvent(CommandEvent E)
