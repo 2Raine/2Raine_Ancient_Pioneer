@@ -86,6 +86,19 @@ powershell -File "D:\caves of qud 模组制作\_tools\preflight.ps1" log
 **这三样没给全之前，不许写 `mod\`、`_tools\` 下的任何文件。**
 收尾同样要贴结论：`sync.ps1 push`，以及 `preflight.ps1 after` 的退出码与结论。
 
+**还有一条更早的前置动作：先把"要动的那个东西"的确切名字查出来。**
+机制查清 ≠ 目标认对。上面三样回答"这件事怎么做"，这一条回答"我动的是哪个东西"。
+
+踩过：做 warm static 的突变豁免，把 `LiquidWarmStatic.GlitchMutations` 与 `Mutations`
+的增删路径查得很细，却**没确认要保护的是哪个类名** —— 于是保护了父类
+`ElectricalGeneration`，而角色身上实际的部件是子类
+`A2Raine_Toncihana_Stormcharge`（`ARaine_Charge.cs:49` 优先按子类名查、`:56` 才退回父类）。
+豁免写完了，保护的却是一个角色并不拥有的东西，等于没写。
+
+**所以在查机制之前，先用一行命令把目标的 `Name=` / `Class=` / `Inherits=` 取出来**，
+例如 `grep -n "class <类名>\|Inherits=" <文件>`。一个 `grep` 的成本，
+换掉一整轮返工。
+
 ```powershell
 # 0) 赋值（每个新会话都要重来一次）
 #    仓库根 = 工作区根，所以只有一个 $ws
