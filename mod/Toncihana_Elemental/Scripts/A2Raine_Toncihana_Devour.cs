@@ -90,7 +90,8 @@ namespace XRL.World.Parts
             // from it.
             List<GameObject> toEat = new List<GameObject>();
             int total = 0;
-            CollectStones(who, toEat, ref total);
+            int stones = 0;
+            CollectStones(who, toEat, ref total, ref stones);
 
             if (toEat.Count == 0)
             {
@@ -98,15 +99,15 @@ namespace XRL.World.Parts
                 return;
             }
 
-            UnityEngine.Debug.Log("[Toncihana] devour: found " + toEat.Count + " stone(s), total "
-                + total + " charge.");
+            UnityEngine.Debug.Log("[Toncihana] devour: " + stones + " stone(s) in "
+                + toEat.Count + " stack(s), total " + total + " charge.");
 
             foreach (GameObject stone in toEat)
             {
                 stone.Destroy();
             }
 
-            int count = toEat.Count;
+            int count = stones;
 
             who.ModIntProperty(A2Raine_SpiritStoneMeal.CHARGE_PROPERTY, total);
             UnityEngine.Debug.Log("[Toncihana] devoured " + count + " spirit stone(s); +"
@@ -123,7 +124,8 @@ namespace XRL.World.Parts
         /// nested any number of containers deep -- because none of Qud's own inventory helpers
         /// descends into containers.
         /// </summary>
-        private static void CollectStones(GameObject Host, List<GameObject> Into, ref int Total)
+        private static void CollectStones(GameObject Host, List<GameObject> Into, ref int Total,
+            ref int Stones)
         {
             List<GameObject> carried;
 
@@ -153,15 +155,26 @@ namespace XRL.World.Parts
                 A2Raine_SpiritStoneMeal meal = item.GetPart<A2Raine_SpiritStoneMeal>();
                 if (meal != null)
                 {
+                    // A spirit stone stacks, so one GameObject can be a whole pile
+                    // (GameObject.cs:617 -- Count is the stack's Number, or 1 when it has no
+                    // Stacker). Charging only meal.Amount was why devouring a pile of them paid
+                    // out a single point and emptied the stack.
+                    int stack = item.Count;
+                    if (stack < 1)
+                    {
+                        stack = 1;
+                    }
+
                     Into.Add(item);
-                    Total += meal.Amount;
+                    Total += meal.Amount * stack;
+                    Stones += stack;
                     continue;
                 }
 
                 // Not a stone -- but if it is a container, its contents count as carried too.
                 if (item.HasPart<Inventory>())
                 {
-                    CollectStones(item, Into, ref Total);
+                    CollectStones(item, Into, ref Total, ref Stones);
                 }
             }
         }
