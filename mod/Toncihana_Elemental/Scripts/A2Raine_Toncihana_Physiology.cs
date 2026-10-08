@@ -94,13 +94,13 @@ namespace XRL.World.Parts
         }
 
         /// <summary>Lower bound of the charge-scaled natural healing multiplier.</summary>
-        public int MinHealingPercent = 10;
+        public int MinHealingPercent = 50;
 
         /// <summary>Upper bound of the charge-scaled natural healing multiplier.</summary>
-        public int MaxHealingPercent = 110;
+        public int MaxHealingPercent = 150;
 
         /// <summary>
-        /// Last computed healing multiplier, 10..110, recomputed each turn by UpdateHealingPercent.
+        /// Last computed healing multiplier, 50..150, recomputed each turn by UpdateHealingPercent.
         /// Kept as a field so the healing path stays allocation-free and does no part lookups.
         /// </summary>
         public int HealingPercent = 100;
@@ -325,8 +325,8 @@ namespace XRL.World.Parts
         private const int CFG_DeflectionStepChance = 10;
         private const int CFG_DeflectionChanceCap = 90;
 
-        private const int CFG_MinHealingPercent = 10;
-        private const int CFG_MaxHealingPercent = 110;
+        private const int CFG_MinHealingPercent = 50;
+        private const int CFG_MaxHealingPercent = 150;
         private const int CFG_BaseHealingPerTick = 1;
         private const int CFG_HealingPerToughnessMod = 1;
         private const int CFG_HealingPerWillpowerModPercent = 25;
@@ -422,7 +422,6 @@ namespace XRL.World.Parts
                 LeakCurrent();
             }
 
-            ProcessChargeScaledHealing();
             CapOccupiedCharge();
             return base.HandleEvent(E);
         }
@@ -610,70 +609,40 @@ namespace XRL.World.Parts
         /// </summary>
         public int ProjectileHitsSeen = 0;
 
-        private void ProcessChargeScaledHealing()
+        /// <summary>
+        /// Scales vanilla's natural healing by the charge the bearer holds, by multiplying the
+        /// amount the healing pipeline has already worked out.
+        ///
+        /// Regenerating2, NOT Regenerating. Stomach.ProcessNaturalHealing fires both in order
+        /// (Stomach.cs:656-660), and every vanilla contributor listens on the FIRST one: the
+        /// Regeneration mutation (Regeneration.cs:70), the cooking effects, TenfoldPath_Hod, the
+        /// cybernetics, and the penalties from Poisoned/Ill/Famished/Albino. By the time
+        /// Regenerating2 goes out they have all had their say, so a single multiplication here
+        /// layers the charge mechanic on top of the complete vanilla result instead of replacing it.
+        ///
+        /// That is also why the blueprint no longer carries DisabledNaturalHealing: that part zeroed
+        /// the amount on the first event, which silently voided every one of those sources.
+        ///
+        /// The amount is not health itself -- vanilla accumulates it in Stomach.RegenCounter and
+        /// grants a point only when it passes 100 -- so this scales the ACCUMULATION RATE, not a
+        /// per-turn heal.
+        /// </summary>
+        public override void Register(GameObject Object, IEventRegistrar Registrar)
         {
-            if (ParentObject == null || !ParentObject.HasHitpoints() || !ParentObject.IsCreature)
+            Registrar.Register("Regenerating2");
+            base.Register(Object, Registrar);
+        }
+
+        public override bool FireEvent(Event E)
+        {
+            if (E.ID == "Regenerating2")
             {
-                return;
+                int amount = E.GetIntParameter("Amount");
+                int percent = HealingPercent;   // kept current by UpdateHealingPercent
+                amount = (int)Math.Round(amount * (percent / 100.0), MidpointRounding.AwayFromZero);
+                E.SetParameter("Amount", amount);
             }
-            if (ParentObject.hitpoints >= ParentObject.baseHitpoints)
-            {
-                return;
-            }
-
-            if (Stat.Random(1, 100) > HealingTickChance)
-            {
-                return;
-            }
-
-            int roll = BaseHealingPerTick
-                + Math.Max(0, ParentObject.StatMod("Toughness")) * HealingPerToughnessMod;
-            roll += (int)Math.Round(
-                roll * (ParentObject.StatMod("Willpower") * HealingPerWillpowerModPercent / 100.0),
-                MidpointRounding.AwayFromZero);
-
-            int chargePercent = ARaine_Charge.GetChargePercent(ParentObject);
-            HealingPercent = MinHealingPercent
-                + (MaxHealingPercent - MinHealingPercent)
-                  * Math.Max(0, Math.Min(100, chargePercent)) / 100;
-
-            int amount = (int)Math.Round(roll * (HealingPercent / 100.0), MidpointRounding.AwayFromZero);
-
-            // REGENERATION, wired in by hand.
-            //
-            // Vanilla's Regeneration boosts healing through the "Regenerating" event that
-            // Stomach.ProcessNaturalHealing fires. My notes record its mutation text as promising
-            // three things: "Your full natural healing rate applies in combat", "N% faster natural
-            // healing rate", and chances to shed debuffs and regrow limbs.
-            //
-            // DisabledNaturalHealing zeroes that event's amount, so Regeneration's healing half was
-            // multiplying zero and doing nothing. Rather than re-enable vanilla natural healing --
-            // which would run a second and larger healing stream alongside this one and drown out the
-            // charge mechanic -- its bonus is applied here, to the number we actually heal for, so the
-            // mutation's own wording stays true:
-            //
-            //   "N% faster natural healing rate"      -> this multiplier. GetRegenerationBonus(level)
-            //                                            is 0.1 + 0.1*level, so +20% at level 1 rising
-            //                                            to +110% at level 10; 1.0 + that = 120%..210%.
-            //   "full natural healing rate in combat" -> EndTurnEvent carries no combat gate, so this
-            //                                            heal already runs every round while fighting.
-            //   limb regrowth / debuff removal        -> separate machinery inside the mutation. It
-            //                                            never depended on the healing event and is
-            //                                            untouched by any of this.
-            Regeneration regeneration = ParentObject.GetPart<Regeneration>();
-            if (regeneration != null)
-            {
-                amount = (int)Math.Round(
-                    amount * (1.0 + regeneration.GetRegenerationBonus(regeneration.Level)),
-                    MidpointRounding.AwayFromZero);
-            }
-
-            if (amount < 1)
-            {
-                amount = 1;
-            }
-
-            ParentObject.Heal(amount, Message: false);
+            return base.FireEvent(E);
         }
     }
 }
