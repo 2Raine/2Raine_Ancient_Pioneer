@@ -37,6 +37,9 @@ namespace XRL.World.Parts
         public Guid LightningSnakeAbilityID = Guid.Empty;
         public Guid ThunderBreathAbilityID = Guid.Empty;
 
+        /// <summary>The face link's toggle: telepathy and the implant's radar, opened together.</summary>
+        public Guid SpiritResonanceAbilityID = Guid.Empty;
+
         /// <summary>Where the eat-a-spirit-stone counter lives. A2Raine_SpiritStoneMeal writes it.</summary>
         public const string CHARGE_PROPERTY = "2Raine_SpiritCharge";
 
@@ -52,12 +55,14 @@ namespace XRL.World.Parts
             "2Raine_Toncihana_Link_Hands",
             "2Raine_Toncihana_Link_Feet",
             "2Raine_Toncihana_Link_Arm",
+            "2Raine_Toncihana_Link_Face",
         };
 
         public static readonly string[] AbilityOrder = {
             "Decree",
             "ThunderStep",
             "ThunderFire",
+            "SpiritResonance",
         };
 
         /// <summary>
@@ -114,6 +119,7 @@ namespace XRL.World.Parts
             if (Key == "ThunderStep") return ThunderStepAbilityID != Guid.Empty;
             if (Key == "LightningSnake") return LightningSnakeAbilityID != Guid.Empty;
             if (Key == "ThunderBreath") return ThunderBreathAbilityID != Guid.Empty;
+            if (Key == "SpiritResonance") return SpiritResonanceAbilityID != Guid.Empty;
             return false;
         }
 
@@ -218,6 +224,21 @@ namespace XRL.World.Parts
                         UITileDefault: carrier5.AbilityIcon);
                 }
                 carrier5.AbilityID = links.ThunderBreathAbilityID;
+            }
+            else if (Key == "SpiritResonance")
+            {
+                A2Raine_Toncihana_SpiritResonance carrier6 = Who.RequirePart<A2Raine_Toncihana_SpiritResonance>();
+                if (!IsAbilityRegistered(Who, carrier6.AbilityCommand))
+                {
+                    links.SpiritResonanceAbilityID = AddMyActivatedAbility(
+                        Name: carrier6.AbilityName,
+                        Command: carrier6.AbilityCommand,
+                        Class: "Skill",
+                        Description: carrier6.AbilityDescription,
+                        Toggleable: true,
+                        DefaultToggleState: false);
+                }
+                carrier6.AbilityID = links.SpiritResonanceAbilityID;
             }
 
             UnityEngine.Debug.Log("[Toncihana] link unlocked '" + Key + "' for " + Who.Blueprint);

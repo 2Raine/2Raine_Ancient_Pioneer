@@ -43,12 +43,14 @@ namespace XRL.World.Parts
             "Thunder Lord's Decree",
             "Thunder Step",
             "Thunder-Fire",
+            "Spirit Resonance",
         };
 
         public static readonly string[] AbilityBlurb = {
             "Melee strikes carry the storm.",
             "Walk the current to a place in sight.",
             "Set the air alight with the charge you hold.",
+            "Hear what is far away, and see the shape of the ground without eyes.",
         };
 
         public override void Initialize()

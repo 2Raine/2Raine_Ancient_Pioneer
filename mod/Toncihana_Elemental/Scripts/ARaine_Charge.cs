@@ -100,10 +100,37 @@ namespace XRL.World.Parts
             return gen == null ? 0 : gen.GetCharge();
         }
 
+        /// <summary>The face link, whose price is a permanently occupied tenth of the charge store.</summary>
+        public const string FaceLinkBlueprint = "2Raine_Toncihana_Link_Face";
+
+        /// <summary>Percent of maximum charge that link holds occupied.</summary>
+        public const int FaceLinkOccupiedPercent = 10;
+
+        /// <summary>Is that link implanted on this creature?</summary>
+        public static bool HasFaceLink(GameObject Object)
+        {
+            return A2Raine_Toncihana_StormLinks.HasLink(Object, FaceLinkBlueprint);
+        }
+
         public static int GetMaxCharge(GameObject Object)
         {
             ElectricalGeneration gen = GetGeneration(Object);
-            return gen == null ? 0 : gen.GetMaxCharge();
+            if (gen == null)
+            {
+                return 0;
+            }
+
+            int max = gen.GetMaxCharge();
+
+            // The face link holds a tenth of the store permanently occupied: it is the price of
+            // hearing the far voice. Both the recharge ceiling and what the bearer can spend read
+            // through here, so the occupied tenth is unavailable on both ends.
+            if (HasFaceLink(Object))
+            {
+                max = max * (100 - FaceLinkOccupiedPercent) / 100;
+            }
+
+            return max;
         }
 
         /// <summary>0..100. Returns 0 when the object has no charge store at all.</summary>
@@ -114,7 +141,7 @@ namespace XRL.World.Parts
             {
                 return 0;
             }
-            int max = gen.GetMaxCharge();
+            int max = GetMaxCharge(Object);
             if (max <= 0)
             {
                 return 0;

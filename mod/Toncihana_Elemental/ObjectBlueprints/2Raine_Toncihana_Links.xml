@@ -35,4 +35,18 @@
     	<part Name="RulesDescription" Text="+1 Strength, +1 Ego" />
   	</object>
 
+  	<object Name="2Raine_Toncihana_Link_Face" Inherits="BaseCyberneticsEquipment_2point">
+    	<part Name="Physics" Weight="0" />
+    	<part Name="Render" DisplayName="{{W|link of the answered call}}" Tile="Items/night_vision_implant.bmp"
+    	      TileColor="&amp;r" DetailColor="C" />
+    	<part Name="Description" Short="Something very far away has been saying your name for a long time. This is where you finally hear it, and where the shape of the ground stops being a secret." />
+    	<part Name="CyberneticsBaseItem" Slots="Face" Cost="0" BehaviorDescription="+1 Ego, +5% chance to refract light, telepathy, penetrating radar, compute power that grows with your level. A tenth of your charge stays occupied." />
+    	<part Name="CyberneticsStatModifier" Stats="Ego:1" />
+    	<part Name="CyberneticsRefractLight" Chance="5" />
+    	<part Name="CyberneticsPenetratingRadar" />
+    	<part Name="A2Raine_Toncihana_ResonanceCompute" />
+    	<part Name="A2Raine_Toncihana_Link" />
+    	<part Name="RulesDescription" Text="+1 Ego, +5% to refract light, telepathy and penetrating radar while spirit resonance is open, +2 compute power per level, 10% of maximum charge occupied" />
+  	</object>
+
 </objects>

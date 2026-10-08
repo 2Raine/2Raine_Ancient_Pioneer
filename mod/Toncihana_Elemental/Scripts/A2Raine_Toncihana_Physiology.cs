@@ -423,7 +423,37 @@ namespace XRL.World.Parts
             }
 
             ProcessChargeScaledHealing();
+            CapOccupiedCharge();
             return base.HandleEvent(E);
+        }
+
+        /// <summary>
+        /// Holds back the share of the charge store the face link keeps occupied.
+        ///
+        /// This is needed even though ARaine_Charge.GetMaxCharge already reports the reduced
+        /// figure: vanilla's own recharge tops the store up against ITS OWN GetMaxCharge
+        /// (ElectricalGeneration.cs:226 -- Math.Min(Charge + Amount, GetMaxCharge())), so without
+        /// this the stored Charge would still climb to 100% and the occupied tenth would only be
+        /// hidden from our own arithmetic rather than actually held back.
+        /// </summary>
+        private void CapOccupiedCharge()
+        {
+            if (!ARaine_Charge.HasFaceLink(ParentObject))
+            {
+                return;
+            }
+
+            ElectricalGeneration generation = ARaine_Charge.GetGeneration(ParentObject);
+            if (generation == null)
+            {
+                return;
+            }
+
+            int cap = ARaine_Charge.GetMaxCharge(ParentObject);
+            if (cap > 0 && generation.Charge > cap)
+            {
+                generation.Charge = cap;
+            }
         }
 
         private void UpdateHealingPercent()
