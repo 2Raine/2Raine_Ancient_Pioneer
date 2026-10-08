@@ -54,6 +54,13 @@ namespace XRL.World.Parts
 
         private static bool installed;
 
+        /// <summary>Same early hook as the chargen filter -- installs as soon as mods load.</summary>
+        [ModSensitiveCacheInit]
+        public static void CachedInit()
+        {
+            Install();
+        }
+
         public static void Install()
         {
             if (installed)

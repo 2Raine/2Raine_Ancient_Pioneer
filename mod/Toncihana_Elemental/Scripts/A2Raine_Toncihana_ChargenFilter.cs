@@ -53,6 +53,20 @@ namespace XRL.World.Parts
 
         private static bool installed;
 
+        /// <summary>
+        /// Runs once when mods finish loading -- EARLIER than any other entry point.
+        ///
+        /// This is the one that matters here: the mutation picker is shown during character
+        /// creation, which happens before PlayerMutator.mutate() and before the load callback, so
+        /// installing from those two left the picker unpatched. Verified in the log: with only
+        /// those two, a session that sat in chargen produced no [Toncihana] output at all.
+        /// </summary>
+        [ModSensitiveCacheInit]
+        public static void CachedInit()
+        {
+            Install();
+        }
+
         public static void Install()
         {
             if (installed)
