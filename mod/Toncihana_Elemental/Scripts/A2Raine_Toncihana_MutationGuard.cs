@@ -74,8 +74,15 @@ namespace XRL.World.Parts
                     postfix: new HarmonyMethod(AccessTools.Method(
                         typeof(A2Raine_Toncihana_MutationGuard), "Postfix")));
 
+                // Ask Harmony what it actually attached. Patch() returning without throwing is NOT
+                // proof the patch is live, and this is the only way to tell from the log.
+                Patches attached = Harmony.GetPatchInfo(target);
+                int prefixCount = attached == null ? -1 : attached.Prefixes.Count;
+                int postfixCount = attached == null ? -1 : attached.Postfixes.Count;
+
                 UnityEngine.Debug.Log("[Toncihana] mutation guard installed: " + PROTECTED_MUTATION
-                    + " survives warm static.");
+                    + " survives warm static. patch info on GlitchMutations: prefix="
+                    + prefixCount + ", postfix=" + postfixCount);
             }
             catch (Exception e)
             {
