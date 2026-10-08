@@ -32,8 +32,16 @@ namespace XRL.World.Parts
     /// </summary>
     public static class A2Raine_Toncihana_MutationGuard
     {
-        /// <summary>Must equal the C# class name: the engine resolves the type through it.</summary>
-        private const string PROTECTED_MUTATION = "ElectricalGeneration";
+        /// <summary>
+        /// Must equal the C# class name: the engine resolves the type through it.
+        ///
+        /// This is the SUBCLASS, not the vanilla parent. Toncihana's charge store is
+        /// A2Raine_Toncihana_Stormcharge : ElectricalGeneration, and it is the subclass that sits
+        /// on the body -- ARaine_Charge.GetGeneration looks for this name first and only falls
+        /// back to ElectricalGeneration (ARaine_Charge.cs:49, :56). Protecting the parent would
+        /// have guarded a part the character does not have.
+        /// </summary>
+        private const string PROTECTED_MUTATION = "A2Raine_Toncihana_Stormcharge";
 
         private static bool installed;
 

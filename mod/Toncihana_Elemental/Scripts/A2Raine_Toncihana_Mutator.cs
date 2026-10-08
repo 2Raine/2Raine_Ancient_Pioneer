@@ -162,14 +162,11 @@ namespace Toncihana
                 // log stays readable and a real fault stands out. Everything verified here was used
                 // to find bugs that has since been fixed, so this is now a regression net, not a
                 // progress report.
+                // Absence of an innate mutation is deliberately NOT a problem any more: warm static
+                // can legitimately reroll either of them, and loading a save no longer puts them
+                // back. What still deserves shouting about is the machinery itself being missing --
+                // the mutation entry, or the Mutations part.
                 bool problem = !entryPresent || before == null;
-                foreach (string name in InnateMutations)
-                {
-                    if (before == null || !before.HasMutation(name))
-                    {
-                        problem = true;
-                    }
-                }
                 // Both of these describe the UNLOCKED state only. While the storm abilities are
                 // withheld, none registered and no carriers attached is exactly right, and checking
                 // them anyway printed a LOAD PROBLEM on every single load.
@@ -193,9 +190,17 @@ namespace Toncihana
                     UnityEngine.Debug.LogWarning("[Toncihana] LOAD PROBLEM" + report);
                 }
 
-                // Repair route. Grant already refuses anyone who is not a Toncihana, so this can
-                // never hand the subclass's mutations to another character.
-                Grant(PlayerBody(), true);
+                // NO Grant HERE ON PURPOSE.
+                //
+                // This used to re-grant the innate mutations on every load, which quietly undid
+                // warm static: a mutation gets rerolled, and the next load hands it straight back.
+                // That is not the same thing as being exempt from the reroll, and it also kept
+                // Regeneration alive -- which is not ours to protect.
+                //
+                // New characters still receive them, from PlayerMutator.mutate(). An existing
+                // character whose Stormcharge is taken by a reroll is restored by
+                // A2Raine_Toncihana_MutationGuard, which restores that one mutation and nothing
+                // else.
             }
             catch (Exception ex)
             {
