@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  <object Name="2Raine_RawGlowfishMeat" Inherits="Raw Meat">
+    <part Name="Render" DisplayName="{{m|raw glowfish meat}}" ColorString="&amp;m" />
+    <part Name="Description" Short="Pale flesh still carries a faint thread of cold light down its spine." />
+    <part Name="Food" Message="It glows faintly on the way down." />
+    <part Name="PreservableItem" Result="Fish Jerky" Number="3" />
+  </object>
+
+  <object Name="2Raine_RawMadpoleMeat" Inherits="Raw Meat">
+    <part Name="Render" DisplayName="{{r|raw madpole meat}}" ColorString="&amp;r" />
+    <part Name="Description" Short="The strips are strung with thin sinew that will not lie flat." />
+    <part Name="Food" Message="Tough, and it fights the jaw." />
+    <part Name="PreservableItem" Result="Fish Jerky" Number="3" />
+  </object>
+
+  <object Name="2Raine_RawGhostPerchMeat" Inherits="Raw Meat">
+    <part Name="Render" DisplayName="{{W|raw ghost perch meat}}" ColorString="&amp;W" />
+    <part Name="Description" Short="The flesh is translucent, and cold to the back of the hand." />
+    <part Name="Food" Message="It tastes of deep water and old ice." />
+    <part Name="PreservableItem" Result="Fish Jerky" Number="4" />
+  </object>
+
+  <object Name="2Raine_RawMemoryEaterMeat" Inherits="Raw Meat">
+    <part Name="Render" DisplayName="{{M|raw memory eater meat}}" ColorString="&amp;M" />
+    <part Name="Description" Short="Rings of muscle narrow toward a mouth that was all of teeth." />
+    <part Name="Food" Message="Something you cannot quite name goes quiet." />
+    <part Name="PreservableItem" Result="Fish Jerky" Number="5" />
+  </object>
+
+  <object Name="2Raine_RawUrchinMeat" Inherits="Raw Meat">
+    <part Name="Render" DisplayName="{{C|raw belcher meat}}" ColorString="&amp;C" />
+    <part Name="Description" Short="Moist fat dissolves slowly from between the fibres, the way the urchin's own flesh did." />
+    <part Name="Food" Message="The moistened fat dissolves slowly." />
+    <part Name="PreservableItem" Result="Fish Jerky" Number="6" />
+  </object>
+
+</objects>

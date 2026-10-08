@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  <object Name="2Raine_FishingPole" Inherits="MeleeWeapon">
+    <part Name="Render" DisplayName="fishing pole" Tile="Items/sw_rod_1.bmp"
+          ColorString="&amp;y" DetailColor="y" />
+
+    <part Name="Description" Short="A long cedar pole strung with braided gut and a bent hook of hammered copper." />
+
+    <part Name="MeleeWeapon" MaxStrengthBonus="2" BaseDamage="1d2" Skill="Cudgel" Stat="Strength" />
+
+    <part Name="A2Raine_FishingPole" CanFishDangerous="false" />
+
+    <part Name="Inventory" />
+    <part Name="A2Raine_FishingRig" />
+
+    <part Name="Physics" Weight="4" />
+    <part Name="Commerce" Value="25" />
+    <part Name="Examiner" Complexity="2" />
+    <part Name="TinkerItem" Bits="01" CanDisassemble="true" CanBuild="true" />
+    <tag Name="Tier" Value="1" />
+  </object>
+
+</objects>

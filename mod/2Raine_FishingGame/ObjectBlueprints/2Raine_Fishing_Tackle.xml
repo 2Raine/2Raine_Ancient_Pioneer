@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  <object Name="2Raine_BeginnerBait" Inherits="Preservable">
+    <part Name="Render" DisplayName="{{w|beginner bait}}" Tile="Items/sw_jar2.bmp"
+          ColorString="&amp;w" TileColor="&amp;y" DetailColor="w" />
+    <part Name="Description" Short="Lagroot mash, salted and jarred, thinned with river water until it holds on a hook." />
+    <part Name="Physics" Weight="1" />
+    <part Name="Commerce" Value="4" />
+    <part Name="A2Raine_FishingBait" SpeedBonus="2000" CatchBonus="0" TreasureBonus="0" />
+    <tag Name="Tier" Value="1" />
+  </object>
+
+  <object Name="2Raine_AdvancedBait" Inherits="Preservable">
+    <part Name="Render" DisplayName="{{W|advanced bait}}" Tile="Items/sw_jar2.bmp"
+          ColorString="&amp;C" TileColor="&amp;y" DetailColor="C" />
+    <part Name="Description" Short="Lagroot mash worked with glowmoss and left to turn. Whatever it is, fish want it." />
+    <part Name="Physics" Weight="1" />
+    <part Name="Commerce" Value="25" />
+    <part Name="A2Raine_FishingBait" SpeedBonus="5000" CatchBonus="10" TreasureBonus="0" />
+    <tag Name="Tier" Value="3" />
+  </object>
+
+  <object Name="2Raine_BrightFlasher" Inherits="Trinket">
+    <part Name="Render" DisplayName="{{C|bright flasher}}" Tile="Items/sw_prism.bmp"
+          ColorString="&amp;C" DetailColor="W" />
+    <part Name="Description" Short="A faceted chip of cut glass on a short trace of gut. It throws the light back in stutters." />
+    <part Name="Physics" Weight="1" />
+    <part Name="Commerce" Value="15" />
+    <part Name="A2Raine_FishingFloat" SpeedBonus="0" CatchBonus="15" TreasureBonus="0" />
+    <tag Name="Tier" Value="2" />
+  </object>
+
+  <object Name="2Raine_TreasureHunterFloat" Inherits="Trinket">
+    <part Name="Render" DisplayName="{{Y|treasure hunter's float}}" Tile="Items/sw_glowsphere.bmp"
+          ColorString="&amp;Y" DetailColor="W" />
+    <part Name="Description" Short="A glass bulb with something bright caught inside it. It hangs low and drags, and it does not care what it snags." />
+    <part Name="Physics" Weight="1" />
+    <part Name="Commerce" Value="40" />
+    <part Name="A2Raine_FishingFloat" SpeedBonus="-1000" CatchBonus="0" TreasureBonus="20" />
+    <tag Name="Tier" Value="3" />
+  </object>
+
+</objects>

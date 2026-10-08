@@ -416,6 +416,7 @@ namespace XRL.World.Parts
         public override bool HandleEvent(EndTurnEvent E)
         {
             UpdateHealingPercent();
+            ClearNaturalHealingBlocker();
 
             if (ReplaceBleedingWithChargeLeak && ParentObject.HasEffect<Bleeding>())
             {
@@ -621,11 +622,29 @@ namespace XRL.World.Parts
         public override void Initialize()
         {
             base.Initialize();
+            ClearNaturalHealingBlocker();
+        }
 
-            if (ParentObject != null && ParentObject.HasPart<DisabledNaturalHealing>())
+        /// <summary>
+        /// Drops vanilla's natural-healing blocker if the bearer still carries one.
+        ///
+        /// The blueprint no longer declares DisabledNaturalHealing, but a blueprint is only read
+        /// when an object is CREATED, and Initialize only runs when a part is ADDED (GameObject.cs:
+        /// :10001) -- a character loaded from a save has neither happen, so it keeps the part and
+        /// vanilla's healing stays switched off. Called from EndTurn as well as Initialize so an
+        /// existing save is repaired on its next turn; after the first removal the check is a single
+        /// dictionary lookup.
+        /// </summary>
+        private void ClearNaturalHealingBlocker()
+        {
+            if (ParentObject == null || !ParentObject.HasPart<DisabledNaturalHealing>())
             {
-                ParentObject.RemovePart<DisabledNaturalHealing>();
+                return;
             }
+
+            ParentObject.RemovePart<DisabledNaturalHealing>();
+            UnityEngine.Debug.Log("[Toncihana] removed DisabledNaturalHealing from "
+                + ParentObject.Blueprint + " at runtime (it predated the blueprint change).");
         }
 
         /// <summary>

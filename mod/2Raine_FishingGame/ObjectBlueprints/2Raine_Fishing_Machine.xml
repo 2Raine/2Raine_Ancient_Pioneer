@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+
+  <object Name="2Raine_AnglersBench" Inherits="Forge">
+    <part Name="Render" DisplayName="{{y|angler's bench}}" Tile="Items/sw_forge.bmp"
+          RenderString="*" ColorString="&amp;C^K" TileColor="&amp;w^k" DetailColor="C"
+          Occluding="false" RenderIfDark="true" />
+    <part Name="Description" Short="A piped hearth of old stone, retooled. Brinestalk splinters smoke inside it, and a rack of hooks and spools hangs off the side." />
+    <part Name="A2Raine_FishingFabricator" />
+    <part Name="Physics" Weight="2500" />
+    <tag Name="NoSparkingQuest" />
+    <stag Name="Heat" />
+    <stag Name="Contemporary" />
+  </object>
+
+</objects>

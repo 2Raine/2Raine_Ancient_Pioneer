@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<books>
+
+  <book ID="2Raine_Fishing_Help" Title="{{W|The Fisher's Patience}}">
+    <page>
+[[Reading the Water]]
+
+A cast is a Sifrah -- a contest of patience and appetite
+against something that does not wish to be found.
+
+Five steps stand between you and the catch:
+
+  reading the water
+  settling the line
+  stilling your breath
+  feeling the bite
+  landing the catch
+
+One answer satisfies each step today. Nothing tells you
+which. You learn it the way fishers do: by trying, and
+by watching what the water learns about you in return.
+</page>
+
+    <page>
+[[Working the Line]]
+
+  1 .. 5     pick a step to address
+  left/right walk between steps
+  Z          complete the turn
+  Esc        walk away
+
+Choosing a step opens the tools you could bring to it.
+Only what you actually carry or know is offered; the
+rest is greyed out, and a tool that fails is learned by
+the water and cannot be used again on that cast.
+
+The chance of landing something is on the right of the
+screen at all times. Watch it as you choose.
+</page>
+
+    <page>
+[[Turning the Page]]
+
+A book with more than one page turns with the numpad:
+4 or 7 for the page before, 6 or 9 for the page after.
+The arrow keys do nothing here. Escape closes it.
+</page>
+
+    <page>
+[[What Will Take Your Hook]]
+
+Not all of it is water.
+
+A line sinks into brine, blood, oil, wine, wax, sludge,
+ooze, sap, honey -- anything soft enough to pass
+through.
+
+It will not enter acid, lava or neutron flux. Those eat
+an ordinary line on contact. You would need a pole built
+to stand them, and no such pole has been carved yet.
+</page>
+
+  </book>
+
+</books>
