@@ -610,6 +610,25 @@ namespace XRL.World.Parts
         public int ProjectileHitsSeen = 0;
 
         /// <summary>
+        /// Removes vanilla's natural-healing blocker if the bearer still carries one.
+        ///
+        /// The blueprint no longer declares DisabledNaturalHealing, but a blueprint is only read
+        /// when an object is CREATED -- a character made before that change still has the part on
+        /// its body, which would keep vanilla's healing pipeline switched off with nothing left to
+        /// replace it (this is what made healing stop entirely for existing saves). Dropping it here
+        /// makes the removal true for old and new characters alike.
+        /// </summary>
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            if (ParentObject != null && ParentObject.HasPart<DisabledNaturalHealing>())
+            {
+                ParentObject.RemovePart<DisabledNaturalHealing>();
+            }
+        }
+
+        /// <summary>
         /// Scales vanilla's natural healing by the charge the bearer holds, by multiplying the
         /// amount the healing pipeline has already worked out.
         ///
