@@ -94,10 +94,10 @@ namespace Toncihana
                 return;
             }
 
-            // Install here as well as in the load callback below: GameLoadedCallback is
-            // [CallAfterGameLoaded] and does NOT run when a character is created, so a new game
-            // started with no patch at all. Install() is idempotent (guard: installed).
+            // Install here as well as in the load callback below. Both Install() methods are
+            // idempotent, so reaching either entry point is enough.
             A2Raine_Toncihana_MutationGuard.Install();
+            A2Raine_Toncihana_ChargenFilter.Install();
 
             UnityEngine.Debug.LogWarning("[Toncihana] PlayerMutator fired. genotype='"
                 + SafeGenotype(player) + "'");
@@ -111,6 +111,7 @@ namespace Toncihana
             try
             {
                 A2Raine_Toncihana_MutationGuard.Install();
+                A2Raine_Toncihana_ChargenFilter.Install();
 
                 GameObject player = PlayerBody();
                 if (player == null)

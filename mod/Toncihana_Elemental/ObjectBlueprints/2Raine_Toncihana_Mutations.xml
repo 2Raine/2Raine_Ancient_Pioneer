@@ -7,7 +7,7 @@
               Cost="4"
               MaxSelected="1"
               Class="A2Raine_Toncihana_Stormcharge"
-              Exclusions="ElectricalGeneration"
+              Exclusions="Electrical Generation"
               BearerDescription="those who brim with storm-charge"
               Tile="Mutations/electrical_generation.bmp" />
 
