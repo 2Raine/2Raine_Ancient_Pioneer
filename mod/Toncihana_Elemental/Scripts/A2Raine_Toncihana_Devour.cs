@@ -106,7 +106,7 @@ namespace XRL.World.Parts
 
             foreach (GameObject stone in toEat)
             {
-                stone.Destroy();
+                TakeWholeStack(stone);
             }
 
             int count = stones;
@@ -119,6 +119,47 @@ namespace XRL.World.Parts
             Popup.Show("{{W|You swallow " + count + " spirit stone"
                 + ((count == 1) ? "" : "s")
                 + " at once. Something in you takes all of it and keeps it.}}");
+        }
+
+        /// <summary>
+        /// Destroys an ENTIRE stack, not just one item of it.
+        ///
+        /// GameObject.Destroy does not know about stacks: destroying a pile of five takes one and
+        /// leaves four behind, which is exactly the "devour again and eat one less each time" bug.
+        /// Stacker.RemoveOne is the supported way down -- it decrements the pile and hands back the
+        /// one it took, or hands back the object itself when only one remains
+        /// (Stacker.cs:62-80) -- so this walks the pile and destroys each part.
+        /// </summary>
+        private static void TakeWholeStack(GameObject Stack)
+        {
+            if (Stack == null)
+            {
+                return;
+            }
+
+            // Bounded so a misbehaving RemoveOne can never spin forever.
+            for (int guard = 0; guard < 100000; guard++)
+            {
+                if (Stack.Count <= 0)
+                {
+                    return;
+                }
+
+                GameObject one = Stack.RemoveOne();
+                if (one == null)
+                {
+                    return;
+                }
+
+                one.Destroy();
+
+                // With a single item left, RemoveOne returns the object itself, which we just
+                // destroyed -- the pile is gone.
+                if (one == Stack)
+                {
+                    return;
+                }
+            }
         }
 
         /// <summary>
