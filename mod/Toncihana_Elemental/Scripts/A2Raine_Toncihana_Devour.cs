@@ -17,14 +17,16 @@ namespace XRL.World.Parts
     /// them the way Food does (ParentObject.Destroy, Food.cs:215), add the total to the charge
     /// counter, and charge one action's energy (UseEnergy(1000, "Item Eat"), Food.cs:211).
     ///
-    /// WHY IT WALKS CONTAINERS BY HAND
-    /// -------------------------------
-    /// Qud's GameObject.GetInventory* family has no recursive form -- every overload stops at the
-    /// top level (GameObject.cs:5367-5504). Two earlier versions used those and both ate exactly
-    /// one stone out of a pile, because stones sitting inside a carried container are invisible to
-    /// all of them. CollectStones therefore recurses into anything that has an Inventory of its
-    /// own, and takes equipped stones too (a spirit stone inherits Floating Glowsphere, so it can
-    /// occupy a body's Floating Nearby).
+    /// WHY A PILE IS ONE OBJECT
+    /// ------------------------
+    /// A spirit stone stacks, so one GameObject can be an entire pile. Its quantity is
+    /// GameObject.Count (XRL/World/GameObject.cs:617 -- the Stacker's Number, or 1 when it has no
+    /// Stacker), and the charge owed is Amount x Count. Charging Amount alone was why devouring a
+    /// pile paid out a single point and emptied the whole stack.
+    ///
+    /// Stones are taken from GetInventoryAndEquipment, so both loose ones and ones sitting in an
+    /// equipment slot count (a spirit stone inherits Floating Glowsphere, so it can occupy a
+    /// body's Floating Nearby).
     ///
     /// WHAT IT DELIBERATELY SKIPS
     /// --------------------------
@@ -120,9 +122,12 @@ namespace XRL.World.Parts
         }
 
         /// <summary>
-        /// Gathers every spirit stone the creature carries -- equipped, loose in the pack, or
-        /// nested any number of containers deep -- because none of Qud's own inventory helpers
-        /// descends into containers.
+        /// Gathers the spirit stones the creature carries -- loose in the pack, or equipped (a
+        /// spirit stone inherits Floating Glowsphere, so it can occupy a body's Floating Nearby).
+        ///
+        /// One GameObject may be a whole pile: the stone stacks, so its quantity is
+        /// GameObject.Count (XRL/World/GameObject.cs:617 -- Stacker.Number, or 1 with no Stacker),
+        /// and the charge owed is Amount x that, not just Amount.
         /// </summary>
         private static void CollectStones(GameObject Host, List<GameObject> Into, ref int Total,
             ref int Stones)
@@ -135,8 +140,8 @@ namespace XRL.World.Parts
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.LogError("[Toncihana] devour: could not read the contents of "
-                    + Host.Blueprint + ": " + e);
+                UnityEngine.Debug.LogError("[Toncihana] devour: could not read what "
+                    + Host.Blueprint + " carries: " + e);
                 return;
             }
 
@@ -155,10 +160,6 @@ namespace XRL.World.Parts
                 A2Raine_SpiritStoneMeal meal = item.GetPart<A2Raine_SpiritStoneMeal>();
                 if (meal != null)
                 {
-                    // A spirit stone stacks, so one GameObject can be a whole pile
-                    // (GameObject.cs:617 -- Count is the stack's Number, or 1 when it has no
-                    // Stacker). Charging only meal.Amount was why devouring a pile of them paid
-                    // out a single point and emptied the stack.
                     int stack = item.Count;
                     if (stack < 1)
                     {
@@ -168,13 +169,6 @@ namespace XRL.World.Parts
                     Into.Add(item);
                     Total += meal.Amount * stack;
                     Stones += stack;
-                    continue;
-                }
-
-                // Not a stone -- but if it is a container, its contents count as carried too.
-                if (item.HasPart<Inventory>())
-                {
-                    CollectStones(item, Into, ref Total, ref Stones);
                 }
             }
         }
