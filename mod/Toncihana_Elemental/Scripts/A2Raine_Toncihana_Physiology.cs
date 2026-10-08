@@ -438,7 +438,7 @@ namespace XRL.World.Parts
         /// </summary>
         private void CapOccupiedCharge()
         {
-            if (!ARaine_Charge.HasFaceLink(ParentObject))
+            if (!ARaine_Charge.IsFaceChargeOccupied(ParentObject))
             {
                 return;
             }

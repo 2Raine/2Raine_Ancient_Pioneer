@@ -65,6 +65,21 @@ namespace XRL.World.Parts.Skill
         /// </summary>
         public Guid TelepathyTracker = Guid.Empty;
 
+        /// <summary>
+        /// Is spirit resonance toggled on for this creature? Public so ARaine_Charge can decide
+        /// whether the face link's tenth of charge is currently being held back.
+        /// </summary>
+        public static bool IsOpen(GameObject Who)
+        {
+            if (Who == null)
+            {
+                return false;
+            }
+
+            ActivatedAbilityEntry ability = Who.GetActivatedAbilityByCommand(COMMAND_NAME);
+            return ability != null && Who.IsActivatedAbilityToggledOn(ability.ID);
+        }
+
         public override bool WantEvent(int ID, int cascade)
         {
             return base.WantEvent(ID, cascade)

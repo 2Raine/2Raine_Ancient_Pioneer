@@ -112,6 +112,25 @@ namespace XRL.World.Parts
             return A2Raine_Toncihana_StormLinks.HasLink(Object, FaceLinkBlueprint);
         }
 
+        /// <summary>
+        /// Is the face link's charge being held back right now -- implanted AND spirit resonance
+        /// toggled on?
+        ///
+        /// This is what the occupied tenth follows: closing the ability gives the tenth back (the
+        /// ceiling returns to the full store), while opening it takes the tenth away again. Only the
+        /// CEILING moves -- closing never refills anything, so a bearer at 30% stays at 30% and
+        /// simply regains the right to recharge all the way up.
+        /// </summary>
+        public static bool IsFaceChargeOccupied(GameObject Object)
+        {
+            if (!HasFaceLink(Object))
+            {
+                return false;
+            }
+
+            return XRL.World.Parts.Skill.A2Raine_Toncihana_SpiritResonance.IsOpen(Object);
+        }
+
         public static int GetMaxCharge(GameObject Object)
         {
             ElectricalGeneration gen = GetGeneration(Object);
@@ -125,7 +144,7 @@ namespace XRL.World.Parts
             // The face link holds a tenth of the store permanently occupied: it is the price of
             // hearing the far voice. Both the recharge ceiling and what the bearer can spend read
             // through here, so the occupied tenth is unavailable on both ends.
-            if (HasFaceLink(Object))
+            if (IsFaceChargeOccupied(Object))
             {
                 max = max * (100 - FaceLinkOccupiedPercent) / 100;
             }
