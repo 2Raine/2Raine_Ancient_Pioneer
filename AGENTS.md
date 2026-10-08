@@ -388,6 +388,23 @@ DSH 那边的工具**恰好也叫 `pwsh`**，但那是宿主自带的工具名�
     踩过：warm static 突变豁免的 Harmony 补丁只挂在载入回调上，开新档测试时**补丁从未安装**，
     连续两轮排查都在看别处，而这正是根因。
 
+16. **`Name` 必须等于 `Class` 是"本模组自己的突变"上的约定 —— 原版不是这样。**
+    我们自己的突变两者写成一样（理由见第〇节：`AddMutation` 通过 `Name` 解析类型，
+    对不上就静默返回 -1）。但原版很多突变两者**不同**，例如
+    `Base/Mutations.xml:16`：
+
+    ```xml
+    <mutation Name="Electrical Generation" Cost="4" MaxSelected="1"
+              Class="ElectricalGeneration" Exclusions="" ... />
+    ```
+
+    **凡是要比对原版突变的地方，用的都是 `Name`（XML 里那个，可以带空格）**：
+    `MutationEntry.Name` 就是它；`OkWith` 的排除比对是它（`MutationEntry.cs:224`）；
+    chargen 列表项的 `Id` 也是它（`QudMutationsModuleWindow.cs:269`）。
+    **`Class` 只用于解析 C# 类型**（例如 `Creatures.xml` 里给生物直接发突变）。
+    踩过：把 `Exclusions` 由 `Electrical Generation` 改成 `ElectricalGeneration`，
+    以为在"对齐 Class"，结果让一条**本来生效**的排除失效了。
+
 更完整的坑与做法见 `Caves of Qud 模组制作入门指南.md`。
 
 ---
