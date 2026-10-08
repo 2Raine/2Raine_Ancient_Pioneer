@@ -67,7 +67,49 @@ namespace XRL.World.Parts.Skill
 
         public override bool WantEvent(int ID, int cascade)
         {
-            return base.WantEvent(ID, cascade) || ID == PooledEvent<CommandEvent>.ID;
+            return base.WantEvent(ID, cascade)
+                || ID == PooledEvent<CommandEvent>.ID
+                || ID == SingletonEvent<EndTurnEvent>.ID;
+        }
+
+        public override bool HandleEvent(EndTurnEvent E)
+        {
+            HideRadarAbility();
+
+            // The ability starts OPEN (DefaultToggleState: true), so it can be on without the
+            // player ever pressing anything -- Open()/Close() only run from the command handler.
+            // Sync from the toggle state instead, which also repairs the lent telepathy after a
+            // load, where no command fired at all.
+            if (ParentObject.IsActivatedAbilityToggledOn(AbilityID))
+            {
+                LendTelepathy();
+            }
+            else
+            {
+                WithdrawTelepathy();
+            }
+
+            return base.HandleEvent(E);
+        }
+
+        /// <summary>
+        /// Keeps the implant's own "Penetrating Radar" ability out of the menu, so spirit resonance
+        /// is the one the player sees and presses and there is not a second radar switch beside it.
+        ///
+        /// The radar itself keeps working: its illumination reads that ability's toggle state
+        /// (CyberneticsPenetratingRadar.cs:48-57), so hiding it changes only whether it advertises
+        /// itself. Checked every turn because the ability is registered by the implant's own
+        /// ImplantedEvent, whose order relative to ours is not something we control.
+        /// </summary>
+        private void HideRadarAbility()
+        {
+            ActivatedAbilityEntry radar = ParentObject.GetActivatedAbilityByCommand(
+                CyberneticsPenetratingRadar.COMMAND_NAME);
+
+            if (radar != null && radar.Visible)
+            {
+                radar.Visible = false;
+            }
         }
 
         public override bool HandleEvent(CommandEvent E)

@@ -78,7 +78,12 @@ namespace XRL.World.Parts
                 return;
             }
 
-            List<GameObject> stones = who.GetInventoryDirect(
+            // GetInventoryDirectAndEquipment, not GetInventoryDirect: a spirit stone inherits
+            // Floating Glowsphere, so it can sit in an equipment slot (the Elemental body has a
+            // Floating Nearby), and GetInventoryDirect only walks Inventory.Objects -- equipped
+            // stones were invisible to the old version, which is why devouring a pile ate one at
+            // a time.
+            List<GameObject> stones = who.GetInventoryDirectAndEquipment(
                 (GameObject go) => go.HasPart<A2Raine_SpiritStoneMeal>());
 
             if (stones == null || stones.Count == 0)
@@ -86,6 +91,9 @@ namespace XRL.World.Parts
                 Popup.ShowFail("You are carrying no spirit stones.");
                 return;
             }
+
+            UnityEngine.Debug.Log("[Toncihana] devour: found " + stones.Count + " stone(s) on "
+                + who.Blueprint + ".");
 
             int count = 0;
             int total = 0;
