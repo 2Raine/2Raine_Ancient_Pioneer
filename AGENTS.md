@@ -427,6 +427,12 @@ DSH 那边的工具**恰好也叫 `pwsh`**，但那是宿主自带的工具名�
     踩过：把 `Exclusions` 由 `Electrical Generation` 改成 `ElectricalGeneration`，
     以为在"对齐 Class"，结果让一条**本来生效**的排除失效了。
 
+17. **提交时只 add 自己的目录** —— 用 `git add mod/Toncihana_Elemental/`，
+    **不要 `git add mod/`，更不要 `git add -A`**。工作区里还放着别的模组
+    （如 `mod/2Raine_FishingGame/`），按目录整加会把它们一并提交并推送。
+    踩过：修旧存档回血时写了 `git add mod/`，把另一个模组整个提交进了 `df7805d`。
+    `publish.ps1` 内部是 `git add -A`，同一个坑 —— 所以提交前先看 `git status --short`。
+
 更完整的坑与做法见 `Caves of Qud 模组制作入门指南.md`。
 
 ---
