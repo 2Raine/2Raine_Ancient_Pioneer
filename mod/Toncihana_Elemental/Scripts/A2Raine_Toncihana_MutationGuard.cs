@@ -89,25 +89,37 @@ namespace XRL.World.Parts
             __state = 0;
             if (!GameObject.Validate(Object))
             {
+                UnityEngine.Debug.Log("[Toncihana] mutation guard prefix: no valid object.");
                 return;
             }
 
             Mutations mutations = Object.GetPart<Mutations>();
             if (mutations == null)
             {
+                UnityEngine.Debug.Log("[Toncihana] mutation guard prefix: " + Object.Blueprint
+                    + " has no Mutations part.");
                 return;
             }
 
             BaseMutation mutation = mutations.GetMutation(PROTECTED_MUTATION);
-            if (mutation != null)
+            if (mutation == null)
             {
-                __state = mutation.BaseLevel;
+                UnityEngine.Debug.Log("[Toncihana] mutation guard prefix: " + PROTECTED_MUTATION
+                    + " is NOT on " + Object.Blueprint + " (nothing to protect; present mutations: "
+                    + DescribeMutations(mutations) + ")");
+                return;
             }
+
+            __state = mutation.BaseLevel;
+            UnityEngine.Debug.Log("[Toncihana] mutation guard prefix: " + PROTECTED_MUTATION
+                + " is on " + Object.Blueprint + " at level " + __state);
         }
 
         /// <summary>Runs after the reroll and restores the mutation if the reroll took it.</summary>
         public static void Postfix(GameObject Object, int __state)
         {
+            UnityEngine.Debug.Log("[Toncihana] mutation guard postfix: state=" + __state);
+
             if (__state <= 0 || !GameObject.Validate(Object))
             {
                 return;
@@ -122,6 +134,26 @@ namespace XRL.World.Parts
             mutations.AddMutation(BaseMutation.Create(PROTECTED_MUTATION), __state);
             UnityEngine.Debug.Log("[Toncihana] warm static took " + PROTECTED_MUTATION
                 + "; restored at level " + __state + " on " + Object.Blueprint);
+        }
+
+        /// <summary>Names of the mutations present, for the diagnostic above.</summary>
+        private static string DescribeMutations(Mutations Mutations)
+        {
+            if (Mutations.MutationList == null)
+            {
+                return "(none)";
+            }
+
+            string text = "";
+            for (int i = 0; i < Mutations.MutationList.Count; i++)
+            {
+                if (i > 0)
+                {
+                    text += ", ";
+                }
+                text += Mutations.MutationList[i].Name;
+            }
+            return text.Length == 0 ? "(none)" : text;
         }
     }
 }
