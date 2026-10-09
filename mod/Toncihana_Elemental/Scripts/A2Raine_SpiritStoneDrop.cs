@@ -30,8 +30,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class A2Raine_SpiritStoneDrop : IPart
     {
-        /// <summary>Chance per creature, IN THOUSANDTHS (1 = one in a thousand).</summary>
-        public int Chance = 1;
+        /// <summary>Chance per creature, IN THOUSANDTHS (5 = five in a thousand).</summary>
+        public int Chance = 5;
 
         public string Blueprint = "2Raine_SpiritStone";
 
