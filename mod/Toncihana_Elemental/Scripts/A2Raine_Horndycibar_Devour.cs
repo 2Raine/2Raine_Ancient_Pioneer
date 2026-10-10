@@ -308,7 +308,7 @@ namespace XRL.World.Parts
             if (ParentObject.IsPlayer())
             {
                 IComponent<GameObject>.AddPlayerMessage("{{W|" + kind
-                    + " has become part of you. Whatever it was, it is growing in you now.}}");
+                    + " has become part of you.}}");
             }
 
             while (AdvanceProgress >= PROGRESS_PER_ADVANCE)
