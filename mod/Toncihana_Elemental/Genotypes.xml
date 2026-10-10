@@ -16,7 +16,6 @@
             BaseSPGain="50"
             BaseMPGain="1"
             Species="elemental"
-            IsMutant="true"
             CharacterBuilderModules="XRL.CharacterBuilds.Qud.QudCasteModule,XRL.CharacterBuilds.Qud.QudCyberneticsModule">
 
     <stat Name="Strength"     Minimum="10" Maximum="24" ChargenDescription="Your {{W|Strength}} score determines how effectively you penetrate your opponents' armor with melee attacks, how much damage your melee attacks do, your ability to resist forced movement, and your carry capacity."/>

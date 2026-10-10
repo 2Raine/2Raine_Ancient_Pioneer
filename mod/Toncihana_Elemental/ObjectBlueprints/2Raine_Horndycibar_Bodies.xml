@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<objects>
+  <object Name="2Raine_Horndycibar_Body" Inherits="2Raine_AncientPioneer_Body">
+    <part Name="Render"
+          DisplayName="horndycibar"
+          Tile="creatures/caste_12.bmp"
+          DetailColor="r" />
+  </object>
+</objects>

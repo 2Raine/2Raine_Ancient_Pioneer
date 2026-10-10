@@ -21,6 +21,18 @@
 
     </subtype>
 
+    <subtype Name="2Raine_Horndycibar"
+             DisplayName="{{R|Horndycibar}}"
+             Gear="2Raine_Toncihana_ElementalGear"
+             BodyObject="2Raine_Horndycibar_Body"
+             Tile="creatures/caste_12.bmp"
+             DetailColor="r">
+
+      <skills>
+      </skills>
+
+    </subtype>
+
   </class>
 
 </subtypes>
