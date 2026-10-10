@@ -392,104 +392,13 @@ namespace XRL.World.Parts
         }
 
         /// <summary>
+        /// <summary>
         /// The tally screen. Every kind is listed with its two counts kept apart and its growth as a
         /// percentage -- the same "kind, count, how far along" shape Becoming prints
         /// (MachineLearning.cs:181), applied to this mod's numbers.
         /// </summary>
-        /// <summary>
-        /// Whether a tally entry names something that lives.
-        ///
-        /// Asked of the BLUEPRINT rather than a live object, because the entries being cleaned are
-        /// names left over from before the IsCombatObject gate existed -- there is no object to
-        /// interrogate. The test is the same one the gate makes, expressed statically: a combat
-        /// object always has a Brain part, so a blueprint whose Parts contain "Brain" is a creature,
-        /// and one without (Shale, Marl, Marlstone -- terrain) is not.
-        ///
-        /// This deliberately keeps plants: Seed-Spitting Vine carries a Brain (Creatures.xml:2328)
-        /// because plants that shoot are real combatants, and they are legitimate Devour targets.
-        /// </summary>
-        private static bool IsCreatureKind(string Kind)
-        {
-            if (string.IsNullOrEmpty(Kind))
-            {
-                return false;
-            }
-
-            GameObjectBlueprint blueprint;
-            if (!GameObjectFactory.Factory.Blueprints.TryGetValue(Kind, out blueprint))
-            {
-                return false;
-            }
-
-            return blueprint.Parts != null && blueprint.Parts.ContainsKey("Brain");
-        }
-
-        /// <summary>
-        /// Drops tally entries that are not creatures, and hands back the advance progress they had
-        /// banked.
-        ///
-        /// KilledEvent fires for broken walls and furniture too, so an earlier build recorded them --
-        /// the log shows Shale at 27 kills, which was enough to complete it and silently grant a
-        /// point. The Record gate stops new ones; this repairs the old ones. It runs when the tally is
-        /// opened, which is a moment the player is already looking at the data, and is cheap.
-        /// </summary>
-        private void PurgeNonCreatures()
-        {
-            List<string> dead = new List<string>();
-            foreach (string kind in Swallowed.Keys)
-            {
-                if (!IsCreatureKind(kind))
-                {
-                    dead.Add(kind);
-                }
-            }
-            foreach (string kind in Killed.Keys)
-            {
-                if (!IsCreatureKind(kind) && !dead.Contains(kind))
-                {
-                    dead.Add(kind);
-                }
-            }
-            foreach (string kind in KindProgress.Keys)
-            {
-                if (!IsCreatureKind(kind) && !dead.Contains(kind))
-                {
-                    dead.Add(kind);
-                }
-            }
-            foreach (string kind in Completed)
-            {
-                if (!IsCreatureKind(kind) && !dead.Contains(kind))
-                {
-                    dead.Add(kind);
-                }
-            }
-
-            if (dead.Count == 0)
-            {
-                return;
-            }
-
-            foreach (string kind in dead)
-            {
-                // A completed non-creature had already banked a point; give it back, never below zero.
-                if (Completed.Remove(kind) && AdvanceProgress > 0)
-                {
-                    AdvanceProgress -= 1;
-                }
-
-                Swallowed.Remove(kind);
-                Killed.Remove(kind);
-                KindProgress.Remove(kind);
-
-                UnityEngine.Debug.Log("[Toncihana] devour: purged non-creature entry '" + kind + "'.");
-            }
-        }
-
         private void ShowTally()
         {
-            PurgeNonCreatures();
-
             StringBuilder sb = new StringBuilder();
             sb.Append("{{W|An Acquired Taste}}\n\n");
 
