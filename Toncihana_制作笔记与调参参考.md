@@ -10,6 +10,7 @@
 | # | 你的要求 | 处理结果 |
 | --- | --- | --- |
 | 1 | 种族自带两个突变 | ✅ 已加。`Genotypes.xml` 里 `<mutation Name="Overcharged Electrical Generation" Level="1" />` + `<mutation Name="Regeneration" Level="1" />`。同时把 `MutationPoints` 从 12 降到 **4**（两个突变值 8 点，4+8=12，总强度仍等于标准突变体） |
+| 1b | （horndycibar 的同一笔账） | ⚠️ **对不上，已知并接受。** horndycibar 与 Toncihana 共用这个 genotype，所以也只拿 4 点初始 MP；但它的两个天生突变只值 **5 点**（`HeatAbsorption` Cost=1，见 `Base/HiddenMutations.xml:8`；`Regeneration` Cost=4，见 `Base/Mutations.xml:30`），于是 **4+5=9，比标准突变体的 12 少 3 点**。2026-10-10 与用户确认：**保持不动**，视作 horndycibar 自有 Devour 成长链的平衡。将来若要补，只能给 horndycibar 单独补（改 genotype 会连 Toncihana 一起变） |
 | 2 | 流血变漏电，且只影响本种族 | ✅ 已做。`Bleeds=0` 关掉液体喷溅；每回合检测流血状态，扣电量 + 概率放小电弧。全部逻辑在 `ToncihanaElementalPhysiology` 里，而该部件只挂在本种族躯体上，**对其他角色零影响** |
 | 3 | 火冰伤害与抗性分开 | ✅ 已分开。抗性回到 **0**（温度变化速度完全原版）；伤害翻倍改到 `BeforeApplyDamageEvent` 里做，只乘伤害不碰温度 |
 | 4 | 贴图用已有可操作角色 | ✅ 已换。全部指向原版 True Kin 阶级立绘（`Creatures/caste_*.bmp`），保证能显示 |
