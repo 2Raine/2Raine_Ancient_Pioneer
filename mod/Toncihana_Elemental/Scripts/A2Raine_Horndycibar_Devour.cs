@@ -124,11 +124,11 @@ namespace XRL.World.Parts
                 RemoveMyActivatedAbility(ref engulfing.ActivatedAbilityID);
                 engulfing.ActivatedAbilityID = AddMyActivatedAbility(
                     "Devour", Engulfing.COMMAND_NAME, "Skill",
-                    "Swallow a nearby creature and digest it.");
+                    "Take a living thing into yourself, and let it feed what you are becoming.");
             }
 
             TasteAbilityID = AddMyActivatedAbility("An Acquired Taste", TASTE_COMMAND, "Skill",
-                "Recall everything that has been swallowed and killed.");
+                "Look inward at every life you have taken in.");
         }
 
         public override void Remove()
@@ -201,7 +201,7 @@ namespace XRL.World.Parts
                     hurt.AddParameter("Damage", damage);
                     hurt.AddParameter("Owner", ParentObject);
                     hurt.AddParameter("Attacker", ParentObject);
-                    hurt.AddParameter("Message", "from %t digestive enzymes!");
+                    hurt.AddParameter("Message", "as your body makes it part of you!");
                     prey.FireEvent(hurt);
                 }
             }
@@ -297,8 +297,8 @@ namespace XRL.World.Parts
 
                 if (ParentObject.IsPlayer())
                 {
-                    IComponent<GameObject>.AddPlayerMessage("{{W|Two more patterns learned. "
-                        + "Something in you hardens. ({{C|+1 Toughness}})}}");
+                    IComponent<GameObject>.AddPlayerMessage("{{W|Two more lives taken in. "
+                        + "Your body answers and grows harder to end. ({{C|+1 Toughness}})}}");
                 }
 
                 UnityEngine.Debug.Log("[Toncihana] devour: " + Completed.Count
@@ -308,7 +308,7 @@ namespace XRL.World.Parts
             if (ParentObject.IsPlayer())
             {
                 IComponent<GameObject>.AddPlayerMessage("{{W|" + kind
-                    + " is fully digested. Its pattern is yours.}}");
+                    + " has become part of you. Whatever it was, it is growing in you now.}}");
             }
 
             while (AdvanceProgress >= PROGRESS_PER_ADVANCE)
@@ -365,7 +365,7 @@ namespace XRL.World.Parts
 
             if (kinds.Count == 0)
             {
-                sb.Append("Nothing yet. Swallow something.\n");
+                sb.Append("You have taken nothing into yourself yet.\n");
             }
             else
             {
@@ -373,12 +373,12 @@ namespace XRL.World.Parts
                 {
                     int percent = Count(KindProgress, kind);
                     sb.Append(kind)
-                      .Append("  {{C|swallowed ").Append(SwallowedCount(kind))
-                      .Append("}}  {{R|killed ").Append(KilledCount(kind)).Append("}}  ");
+                      .Append("  {{C|taken in ").Append(SwallowedCount(kind))
+                      .Append("}}  {{R|felled ").Append(KilledCount(kind)).Append("}}  ");
 
                     if (Completed.Contains(kind))
                     {
-                        sb.Append("{{G|complete}}");
+                        sb.Append("{{G|wholly yours}}");
                     }
                     else
                     {
@@ -389,9 +389,9 @@ namespace XRL.World.Parts
                 }
             }
 
-            sb.Append("\n{{W|Rapid advance}} ").Append(AdvanceProgress)
+            sb.Append("\n{{W|Growth}} ").Append(AdvanceProgress)
               .Append(" / ").Append(PROGRESS_PER_ADVANCE)
-              .Append("   {{K|kinds complete: ").Append(Completed.Count).Append("}}");
+              .Append("   {{K|lives wholly yours: ").Append(Completed.Count).Append("}}");
 
             Popup.Show(sb.ToString());
         }
