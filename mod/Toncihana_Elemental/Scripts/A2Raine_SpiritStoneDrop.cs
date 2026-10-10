@@ -30,8 +30,8 @@ namespace XRL.World.Parts
     [Serializable]
     public class A2Raine_SpiritStoneDrop : IPart
     {
-        /// <summary>Chance per creature, IN THOUSANDTHS (5 = five in a thousand).</summary>
-        public int Chance = 5;
+        /// <summary>Percent chance per creature (1 = one in a hundred).</summary>
+        public int Chance = 1;
 
         public string Blueprint = "2Raine_SpiritStone";
 
@@ -45,7 +45,7 @@ namespace XRL.World.Parts
             // The event goes to the dying creature's own parts (that is how Corpse uses it), so
             // ParentObject is the one dying. The player is excluded: they are a Creature too, and
             // would otherwise be born holding a stone.
-            if (!ParentObject.IsPlayer() && Chance.in1000())
+            if (!ParentObject.IsPlayer() && Chance.in100())
             {
                 Drop();
             }
