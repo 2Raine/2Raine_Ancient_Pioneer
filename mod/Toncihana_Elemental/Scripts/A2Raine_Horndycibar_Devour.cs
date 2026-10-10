@@ -63,7 +63,6 @@ namespace XRL.World.Parts
     /// </summary>
     public class A2Raine_Horndycibar_Devour : IPart
     {
-        public const string DEVOUR_COMMAND = "CommandA2Raine_Horndycibar_Devour";
         public const string TASTE_COMMAND = "CommandA2Raine_Horndycibar_AcquiredTaste";
 
         /// <summary>Kills of one kind that add a point of progress.</summary>
@@ -75,7 +74,6 @@ namespace XRL.World.Parts
         /// <summary>Ranks added when a rapid advance fires; vanilla's own figure (Leveler.cs:270).</summary>
         public const int ADVANCE_RANKS = 3;
 
-        public Guid DevourAbilityID = Guid.Empty;
         public Guid TasteAbilityID = Guid.Empty;
 
         /// <summary>Blueprint name of each kind swallowed -> how many of it have died inside.</summary>
@@ -85,16 +83,28 @@ namespace XRL.World.Parts
 
         public override void Initialize()
         {
-            DevourAbilityID = AddMyActivatedAbility("Devour", DEVOUR_COMMAND, "Skill",
-                "Swallow a nearby creature and digest it.");
+            base.Initialize();
+
+            // Vanilla's Engulfing adds an ability of its own, named "Engulf". This mod calls that
+            // act Devour, so the ability it created is taken back and one carrying the SAME command
+            // put in its place -- reusing Engulfing's own COMMAND_NAME means the key still runs
+            // Engulfing's target picker and its Engulf() checks, only the wording is ours. There is
+            // deliberately no second, separate swallow ability.
+            Engulfing engulfing = ParentObject.GetPart<Engulfing>();
+            if (engulfing != null)
+            {
+                RemoveMyActivatedAbility(ref engulfing.ActivatedAbilityID);
+                engulfing.ActivatedAbilityID = AddMyActivatedAbility(
+                    "Devour", Engulfing.COMMAND_NAME, "Skill",
+                    "Swallow a nearby creature and digest it.");
+            }
+
             TasteAbilityID = AddMyActivatedAbility("An Acquired Taste", TASTE_COMMAND, "Skill",
                 "Recall everything that has died inside you.");
-            base.Initialize();
         }
 
         public override void Remove()
         {
-            RemoveMyActivatedAbility(ref DevourAbilityID);
             RemoveMyActivatedAbility(ref TasteAbilityID);
             base.Remove();
         }
@@ -114,19 +124,19 @@ namespace XRL.World.Parts
             base.Register(Object, Registrar);
         }
 
+        /// <summary>
+        /// CommandEvent.ID has to be listed: HandleEvent(CommandEvent) is only delivered for events
+        /// this part asked for, so without it the abilities do nothing when pressed.
+        /// </summary>
         public override bool WantEvent(int ID, int cascade)
         {
-            return base.WantEvent(ID, cascade) || ID == KilledEvent.ID;
+            return base.WantEvent(ID, cascade)
+                || ID == PooledEvent<CommandEvent>.ID
+                || ID == KilledEvent.ID;
         }
 
         public override bool HandleEvent(CommandEvent E)
         {
-            if (E.Command == DEVOUR_COMMAND)
-            {
-                Devour();
-                return false;
-            }
-
             if (E.Command == TASTE_COMMAND)
             {
                 ShowTally();
@@ -196,63 +206,6 @@ namespace XRL.World.Parts
             int dice = (int)Math.Round(x / 4.0, MidpointRounding.AwayFromZero);
 
             return Math.Max(1, dice);
-        }
-
-        private void Devour()
-        {
-            if (ParentObject == null || ParentObject.CurrentCell == null)
-            {
-                return;
-            }
-
-            Engulfing engulfing = ParentObject.GetPart<Engulfing>();
-            if (engulfing == null)
-            {
-                Popup.ShowFail("You have nothing to swallow with.");
-                return;
-            }
-
-            List<GameObject> candidates = new List<GameObject>();
-            foreach (Cell cell in ParentObject.CurrentCell.GetAdjacentCells())
-            {
-                foreach (GameObject obj in cell.GetObjects())
-                {
-                    if (obj == null || obj == ParentObject || !obj.IsCombatObject())
-                    {
-                        continue;
-                    }
-
-                    candidates.Add(obj);
-                }
-            }
-
-            if (candidates.Count == 0)
-            {
-                Popup.ShowFail("There is nothing beside you to swallow.");
-                return;
-            }
-
-            string[] options = new string[candidates.Count];
-            for (int i = 0; i < candidates.Count; i++)
-            {
-                options[i] = candidates[i].ShortDisplayName;
-            }
-
-            int pick = Popup.PickOption("Swallow what?", null, "", "Sounds/Misc/sfx_characterMod_mutation_windowPopup", options);
-            if (pick < 0 || pick >= candidates.Count)
-            {
-                return;
-            }
-
-            GameObject target = candidates[pick];
-            if (!engulfing.Engulf(target))
-            {
-                return;
-            }
-
-            ParentObject.UseEnergy(1000, "Physical Mutation");
-            UnityEngine.Debug.Log("[Toncihana] devour: swallowed " + target.Blueprint
-                + " (max hp " + BearerHitPoints() + " -> " + DiceFor(BearerHitPoints()) + "d4 per turn).");
         }
 
         /// <summary>Kills of one kind add a point of progress every KILLS_PER_PROGRESS of them.</summary>
