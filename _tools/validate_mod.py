@@ -64,7 +64,7 @@ for path in sorted(xml_files):
 # Load="Merge" so that every creature gets it, which is the supported way to reach them all.
 BORROWED_OK = re.compile(r"^(Tactics_|Survival_|CookingAndGathering|Cudgel$|"
                          r"ElectricalGeneration$|ElectromagneticPulse$|Regeneration$|"
-                         r"Creature$)")
+                         r"HeatAbsorption$|Creature$)")
 PREFIX = re.compile(r"^(A?2Raine_)")
 TILE_OK = re.compile(r"^[A-Za-z_]+/")     # vanilla tile paths like Creatures/caste_16.bmp
 

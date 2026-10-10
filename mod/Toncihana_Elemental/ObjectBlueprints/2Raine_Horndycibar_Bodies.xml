@@ -8,5 +8,8 @@
 
     <part Name="Engulfing" />
     <part Name="A2Raine_Horndycibar_Devour" />
+
+    <mutation Name="HeatAbsorption" Level="5" />
+    <mutation Name="Regeneration" Level="1" />
   </object>
 </objects>
