@@ -86,6 +86,9 @@ namespace XRL.World.Parts
         /// <summary>Completed kinds that trigger one rapid advance.</summary>
         public const int PROGRESS_PER_ADVANCE = 4;
 
+        /// <summary>Completed kinds per point of Toughness gained.</summary>
+        public const int COMPLETIONS_PER_TOUGHNESS = 2;
+
         /// <summary>Ranks added when a rapid advance fires; vanilla's own figure (Leveler.cs:270).</summary>
         public const int ADVANCE_RANKS = 3;
 
@@ -283,6 +286,24 @@ namespace XRL.World.Parts
 
             Completed.Add(kind);
             AdvanceProgress += 1;
+
+            // Every COMPLETIONS_PER_TOUGHNESS completed kinds add a point of Toughness. Setting the
+            // stat's BaseValue is what the engine watches: Leveler.cs:39-64 handles StatChangeEvent
+            // and carries the hit-point change through on its own, including the per-level term, so
+            // nothing else has to be adjusted here.
+            if (Completed.Count % COMPLETIONS_PER_TOUGHNESS == 0)
+            {
+                ParentObject.GetStat("Toughness").BaseValue += 1;
+
+                if (ParentObject.IsPlayer())
+                {
+                    IComponent<GameObject>.AddPlayerMessage("{{W|Two more patterns learned. "
+                        + "Something in you hardens. ({{C|+1 Toughness}})}}");
+                }
+
+                UnityEngine.Debug.Log("[Toncihana] devour: " + Completed.Count
+                    + " kinds complete, Toughness +1.");
+            }
 
             if (ParentObject.IsPlayer())
             {
