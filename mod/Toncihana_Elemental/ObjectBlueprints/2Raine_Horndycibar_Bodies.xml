@@ -5,5 +5,8 @@
           DisplayName="horndycibar"
           Tile="creatures/caste_12.bmp"
           DetailColor="r" />
+
+    <part Name="Engulfing" />
+    <part Name="A2Raine_Horndycibar_Devour" />
   </object>
 </objects>
