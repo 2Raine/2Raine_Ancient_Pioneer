@@ -246,11 +246,7 @@ namespace XRL.World.Parts
         /// </summary>
         private void Record(GameObject Prey)
         {
-            string kind = Prey.Blueprint;
-            if (string.IsNullOrEmpty(kind))
-            {
-                kind = Prey.ShortDisplayName;
-            }
+            string kind = KindOf(Prey);
 
             bool swallowed = Prey.GetEffect<Engulfed>() != null;
             if (swallowed)
@@ -318,6 +314,52 @@ namespace XRL.World.Parts
                     + " kinds complete, calling Leveler.RapidAdvancement(" + ADVANCE_RANKS + ").");
                 Leveler.RapidAdvancement(ADVANCE_RANKS, ParentObject);
             }
+        }
+
+        /// <summary>
+        /// The KIND a creature is counted as.
+        ///
+        /// The blueprint name is the unit: "Snapjaw Hunter" and "Snapjaw Scavenger" are two kinds,
+        /// which is the granularity wanted here. But vanilla also spawns kit variants under a
+        /// numbered name -- "Snapjaw Hunter 0", "... 1", "... 2" -- and 34 blueprints in
+        /// Base/Creatures.xml are named that way. Counting those separately would split one kind into
+        /// three, so a trailing pure-number word is dropped and the variants share their parent's
+        /// kind. Only a SEPARATE final word that is all digits is stripped, so a name with digits in
+        /// it survives intact.
+        ///
+        /// This is deliberately NOT Becoming's rule: its GetLearnableKind (MachineLearning.cs:231-247)
+        /// walks up Inherits until it leaves the Base* tier, which would fold every Snapjaw -- Hunter,
+        /// Scavenger, Brute and all -- into a single kind, coarser than what is wanted here.
+        /// </summary>
+        private static string KindOf(GameObject Prey)
+        {
+            string kind = Prey.Blueprint;
+            if (string.IsNullOrEmpty(kind))
+            {
+                kind = Prey.ShortDisplayName;
+            }
+
+            if (string.IsNullOrEmpty(kind))
+            {
+                return kind;
+            }
+
+            int space = kind.LastIndexOf(' ');
+            if (space <= 0 || space == kind.Length - 1)
+            {
+                return kind;
+            }
+
+            string tail = kind.Substring(space + 1);
+            for (int i = 0; i < tail.Length; i++)
+            {
+                if (!char.IsDigit(tail[i]))
+                {
+                    return kind;
+                }
+            }
+
+            return kind.Substring(0, space);
         }
 
         private static int Count(Dictionary<string, int> Table, string Kind)
