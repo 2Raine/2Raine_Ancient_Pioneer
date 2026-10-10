@@ -246,6 +246,19 @@ namespace XRL.World.Parts
         /// </summary>
         private void Record(GameObject Prey)
         {
+            // Only creatures count. KilledEvent also fires for destroyable furniture and terrain --
+            // walls, doors, workbenches, plants -- and they carry Hitpoints, so without this gate a
+            // session spent smashing walls fills the tally with architecture.
+            //
+            // IsCombatObject() is the right test: GameObject.cs:1570 reads a flag whose own
+            // obsolete overload documents it as "combat flagged objects always have Brain part",
+            // which is exactly "a thing that lives and can fight". A wall has no Brain, so it fails
+            // here; robots and plants that DO have a Brain still pass.
+            if (!Prey.IsCombatObject())
+            {
+                return;
+            }
+
             string kind = KindOf(Prey);
 
             bool swallowed = Prey.GetEffect<Engulfed>() != null;
